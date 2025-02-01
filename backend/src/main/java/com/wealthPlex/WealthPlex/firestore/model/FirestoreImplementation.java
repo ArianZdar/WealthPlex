@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Configuration
-public class firestoreImplementation {
+public class FirestoreImplementation {
 
     private final String serviceAcccountPath = System.getenv("WEALTHPLEX_APPLICATION_CREDENTIALS");
     private final String projectId = System.getenv("WEALTHPLEX_PROJECTID");
