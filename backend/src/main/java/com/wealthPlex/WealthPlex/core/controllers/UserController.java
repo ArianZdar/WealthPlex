@@ -1,4 +1,4 @@
-package main.java.com.wealthPlex.WealthPlex.core.controllers;
+package com.wealthPlex.WealthPlex.core.controllers;
 
 
 import org.springframework.web.bind.annotation.GetMapping;
