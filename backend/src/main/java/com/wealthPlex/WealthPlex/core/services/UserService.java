@@ -1,6 +1,7 @@
 package com.wealthPlex.WealthPlex.core.services;
 
 
+import com.wealthPlex.WealthPlex.core.models.Stock;
 import com.wealthPlex.WealthPlex.core.models.User;
 import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,45 @@ public class UserService {
     }
 
 
+    public Map<String, Object> setInvestorType(String username, boolean isLongTermInvestor) {
+        User user = (User) userRepository.getDocumentById(username);
+        user.setLongTermInvestor(isLongTermInvestor);
+        userRepository.saveDocumentWithId(username,user);
+        return userRepository.getAsMap(user);
+    }
 
+    public Stock getStockFromUser(String username, String stockSymbol) {
+        User user = (User) userRepository.getDocumentById(username);
+        List<Stock> stocks = user.getStocks();
+        Stock stock = stocks.stream().
+                filter((Stock ownedStock ) -> ownedStock.getSymbol().equals(stockSymbol)).
+                findFirst().orElse(null);
+        return stock;
+    }
+
+    public Map<String, Object> buyStock(String username, String symbol, double price, int amount) throws FileNotFoundException {
+        User user = (User) userRepository.getFromMap(getUserByUsername(username));
+        List<Stock> stocks = user.getStocks();
+        boolean hasStock = stocks.stream().anyMatch(stock -> stock.getSymbol().equals(symbol));
+        if (!hasStock) {
+            Stock stock = new Stock();
+            stock.setSymbol(symbol);
+            stock.setPrice(price);
+            stock.setAmount(amount);
+            stocks.add(stock);
+        } else {
+            Stock stock = stocks.stream().
+                    filter((Stock ownedStock ) -> ownedStock.getSymbol().equals(symbol)).
+                    findFirst().orElse(null);
+
+            double totalPrice = stock.getPrice() * stock.getAmount();
+            totalPrice += price*amount;
+            int totalAmount = stock.getAmount() + amount;
+            stock.setPrice(totalPrice/totalAmount);
+            stock.setAmount(totalAmount);
+        }
+        userRepository.saveDocumentWithId(username,user);
+        return userRepository.getAsMap(user);
+    }
 
 }
