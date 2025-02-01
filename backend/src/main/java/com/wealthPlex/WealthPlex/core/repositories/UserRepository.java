@@ -70,7 +70,7 @@ public class UserRepository extends DocumentRepository {
     public Stock getStockFromMap(Map<String, Object> map) {
         Stock stock = new Stock();
         stock.setSymbol((String) map.get("symbol"));
-        stock.setAmount(Double.parseDouble(map.get("amount").toString()));
+        stock.setAmount(Integer.parseInt(map.get("amount").toString()));
         stock.setPrice(Double.parseDouble(map.get("price").toString()));
         return stock;
     }
