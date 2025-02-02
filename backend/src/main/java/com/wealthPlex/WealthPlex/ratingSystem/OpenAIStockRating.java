@@ -3,8 +3,13 @@ package com.wealthPlex.WealthPlex.ratingSystem;
 import org.json.JSONObject;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
+
+import ch.qos.logback.core.boolex.Matcher;
+
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.regex.Pattern;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
@@ -28,10 +33,10 @@ public class OpenAIStockRating {
         System.out.println("✅ Alpha Vantage API Key: " + ALPHA_VANTAGE_API_KEY);
     }
 
-    // ✅ Now `getStockRating()` extracts rating from AI response
+    
     public String getStockRating(String stockSymbol, String username) throws IOException {
         String fullResponse = getStockExplanation(stockSymbol, username);
-        return extractStockRating(fullResponse);  // Extracts only the rating from AI response
+        return extractStockRating(fullResponse);  
     }
 
     public String getStockExplanation(String stockSymbol, String username) throws IOException {
@@ -49,7 +54,7 @@ public class OpenAIStockRating {
                 "You are a financial analyst. Given the stock name and the type of investor you are advising for (short term or long term), provide a **detailed** analysis in 1-2 paragraphs. You must also look on the internet for the company's financial performance, market trends, and growth prospects and conclude with a rating out of 10 on if this is good for the selected type of investor." +
                 "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
                 "Mention recent news that may impact the stock price, whether positively or negatively. " +
-                "Do not give a simple rating, but a **full analysis**."),
+                "You Must give a rating out of 10, and you must provide an in depth analysis"),
             new JSONObject().put("role", "user").put("content",
                 "Stock: " + stockSymbol + ", Price: $" + price +
                 ", Volatility: " + volatility + ", User: " + username)
@@ -105,9 +110,17 @@ public class OpenAIStockRating {
                            .getString("content");
     }
 
-    // ✅ Make extractStockRating PUBLIC so the controller can call it
     public String extractStockRating(String aiResponse) {
-        return aiResponse.replaceAll(".*?(\\b\\d+/10\\b).*", "$1");  // Extracts rating (e.g., 8/10)
+        // Regular expression to extract numbers followed by "/10"
+        Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?)/10");
+        java.util.regex.Matcher matcher = pattern.matcher(aiResponse);
+    
+        if (matcher.find()) {
+            return matcher.group(1) + "/10";  // Extracted rating
+        }
+    
+        // If no rating found, return a default message
+        return "Error: No valid rating found in AI response.";
     }
 
     private BigDecimal getVolatility() {

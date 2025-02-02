@@ -20,7 +20,7 @@ public class RankingController {
         @PathVariable String stockSymbol,
         @RequestParam String username) {
         try { 
-            // 🔹 Now, we extract rating from AI response instead of making a second API call
+           
             String fullResponse = stockRatingService.getStockExplanation(stockSymbol, username);
             String extractedRating = stockRatingService.extractStockRating(fullResponse);
 
