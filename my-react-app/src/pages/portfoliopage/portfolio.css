@@ -1,0 +1,92 @@
+/* General Styling */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-image: #FAFAFA; /* Light background */
+    color: #333;
+
+}
+
+/* Portfolio Container */
+.portfolio-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+/* Portfolio Balance */
+.balance-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0057FF, #003FCC); /* Wealthsimple blue gradient */
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 87, 255, 0.2);
+}
+
+.balance-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.balance-amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* Stock Table */
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.stock-table th, .stock-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.stock-table th {
+    background: #f7f7f7;
+    font-weight: 600;
+}
+
+.stock-name {
+    font-weight: bold;
+}
+
+.stock-price {
+    color: #0057FF;
+}
+
+.stock-change.positive {
+    color: #27AE60; /* Green for gains */
+}
+
+.stock-change.negative {
+    color: #E74C3C; /* Red for losses */
+}
+
+/* Back Button */
+.back-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: #0057FF;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.back-button:hover {
+    background: #003FCC;
+}

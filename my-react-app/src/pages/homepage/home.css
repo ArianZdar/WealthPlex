@@ -1,46 +1,88 @@
 /* General Styles */
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f5f5; /* Light gray background */
-    color: #333; /* Neutral dark text color */
-  }
-  
-  h1 {
-    font-size: 3rem;
-    color: #2a2a2a; /* Dark neutral for title */
+    font-family: 'Inter', sans-serif;
+    background-image: url('../../assets/charts3.webp'); 
+    color: #333; /* Dark text for readability */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container - Centered layout */
+.container {
+    max-width: 900px;
+    height: 40rem;
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); /* Soft shadow */
+    transition: transform 0.3s ease;
+}
+
+.container:hover {
+    transform: scale(1.02); /* Subtle hover effect */
+}
+
+/* Title Styling */
+h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2A2A2A; /* Wealthsimple-like dark gray */
     margin-bottom: 1rem;
-  }
-  
-  p {
-    font-size: 1.2rem;
+}
+
+/* Subtitle / Description */
+p {
+    font-size: 1.1rem;
+    color: #555; /* Lighter gray for contrast */
     line-height: 1.6;
-    color: #555; /* Softer gray for paragraph text */
-  }
-  
-  .container {
-    max-width: 1200px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 2rem;
-    text-align: center; /* Center-align text */
-  }
-  
-  /* Button Styling */
-  .button {
+}
+
+/* Wealthsimple-Inspired Button */
+.button {
     display: inline-block;
-    padding: 0.75rem 1.5rem;
-    margin-top: 2rem;
+    padding: 12px 24px;
     font-size: 1rem;
     font-weight: bold;
-    color: white;
-    background-color: #0057ff; /* Wealthsimple-like blue */
+    color: #ffffff;
+    background: #5D8736; /* Wealthsimple Blue */
     border: none;
-    border-radius: 25px;
+    border-radius: 30px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .button:hover {
-    background-color: #003fcc; /* Slightly darker blue on hover */
-  }
-  
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 87, 255, 0.2); /* Soft button shadow */
+}
+
+.button:hover {
+    background: #007a4c; /* Darker blue on hover */
+    transform: translateY(-3px); /* Lift effect */
+}
+
+.button:active {
+    transform: translateY(1px); /* Press effect */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 2rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    .button {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+}

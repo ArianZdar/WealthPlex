@@ -1,0 +1,98 @@
+/* login.css */
+:root {
+    --primary-color: #0052FF;
+    --background-color: #F9FAFB;
+    --input-border-color: #D1D5DB;
+    --text-color: #374151;
+    --card-background: #FFFFFF;
+    --button-background: #0052FF;
+    --button-hover: #0041CC;
+    --button-login-color: #5D8736;
+}
+
+body {
+    background-color: var(--background-color);
+    font-family: 'Inter', sans-serif;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.login-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 12px;
+}
+
+.login-title span {
+    color: var(--primary-color);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+.login-input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.login-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 6px rgba(0, 82, 255, 0.2);
+}
+
+.login-button {
+    width: 100%;
+    height: 40px;
+    margin-top: 10px;
+    background-color: var( --button-login-color);
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: medium;
+}
+
+.login-button:hover {
+    background-color: var(--button-hover);
+}
+
+span.title{
+    color: #5D8736;
+}
