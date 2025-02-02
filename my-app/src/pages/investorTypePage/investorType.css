@@ -17,24 +17,24 @@
 }
 
 .investment-title {
-    font-size: 36px;
+    font-size: 48px;
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 100px;
     color: #ffffff;
 }
 
 .button-container {
     display: flex;
-    gap: 20px;
+    gap: 50px;
 }
 
 .investment-button {
     background: linear-gradient(95deg, #163b2c, #024117);
     color: #ffffff;
     border: none;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
-    padding: 15px 30px;
+    padding: 25px 40px;
     border-radius: 10px;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -46,11 +46,11 @@
 }
 
 .short-term-button {
-    background: linear-gradient(95deg, #ff9900, #cc6600); /* Orange for short term */
+    background: linear-gradient(95deg, #1e4e29, #cc6600); 
 }
 
 .long-term-button {
-    background: linear-gradient(95deg, #3366cc, #003399); /* Blue for long term */
+    background: linear-gradient(95deg, #72a0fb, #011a4d);
 }
 
 @media (max-width: 768px) {
