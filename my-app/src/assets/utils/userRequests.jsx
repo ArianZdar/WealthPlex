@@ -11,10 +11,8 @@ async function signup(username, password) {
         });
 
         if (!response.ok) throw new Error("Failed to signup");
-
-        const result = await response.json();
-        console.log("Signup Response:", result);
-        return result;
+        await response;
+        
     } catch (error) {
         console.error("Signup Error:", error.message);
         throw error; // Rethrow error to handle it in UI
@@ -162,6 +160,24 @@ async function getStocks(username) {
     }
 }
 
+async function getProfitOnStock(username,Symbol) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/stocks/"+Symbol+"/profit", {
+            method: "GET"
+        });
+
+        if (!response.ok) throw new Error("Failed to add stock to list");
+
+        const result = await response;
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+
+}
+
 
 
 
@@ -169,5 +185,5 @@ async function getStocks(username) {
 
 
 // Export both functions
-export { signup, login ,getPortfolioValue,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks};
+export { signup, login ,getPortfolioValue,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks,getProfitOnStock};
 

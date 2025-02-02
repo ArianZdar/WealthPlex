@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
-import { getPortfolioValue, addStockToWatchlist,removeStockFromWatchlist ,getUserWatchlist,getStocks,buyStock,sellStock} from '../../assets/utils/userRequests'
+import { getPortfolioValue, addStockToWatchlist,removeStockFromWatchlist ,getUserWatchlist,getStocks,buyStock,sellStock,getProfitOnStock} from '../../assets/utils/userRequests'
 
 function Portfolio() {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ function Portfolio() {
   // Function to handle adding a stock/ETF when user clicks "Add Stock"
   const [watchlist, setWatchlist] = useState([]);
   const [stocklist, setStocklist] = useState([]);
+  const [profitlist, setProfit] = useState([]);
   
   const handleAddStock = async (e) => {
     e.preventDefault();
@@ -78,6 +79,8 @@ function Portfolio() {
     } catch (error) {
       setError("Failed to add stock to watchlist: " + error.message);
     }
+
+
   };
 
   
@@ -101,6 +104,19 @@ function Portfolio() {
       // Call addStockToWatchlist and wait for the response
       const updatedPortfolio = await sellStock(username,quantity,symbol);
       setStocklist(updatedPortfolio); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+
+  };
+
+  const handleGetProfitForStock = async (symbol,index) => {
+    const username = localStorage.getItem("loggedInUsername");
+    
+    try {
+      // Call addStockToWatchlist and wait for the response
+      const profit = await getProfitOnStock(username,symbol);
+      profitlist[index] = profit;
     } catch (error) {
       setError("Failed to add stock to watchlist: " + error.message);
     }
@@ -201,8 +217,8 @@ function Portfolio() {
           <th>Stock/ETF</th>
           <th>Price</th>
           <th>Amount</th>
-          <th>CurrentPrice</th>
           <th>Sell</th>
+          <th>Open\Gain Loss</th>
         </tr>
       </thead>
     </table>
@@ -228,7 +244,7 @@ function Portfolio() {
                     className="input-field"
                     placeholder="Enter price"
                   />
-                  <button className="sell-button" onClick={() => handleSellStock(stock.symbol, stock.quantity, stock.price)}>Sell</button>
+                  <button className="sell-button" onClick={() => handleSellStock(stock.symbol, stock.quantity)}>Sell</button>
                 </div>
               </td>
               <td>
