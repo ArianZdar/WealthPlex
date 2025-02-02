@@ -26,12 +26,12 @@ public class UserController {
     }
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users/login")
-    public Map<String,Object> getLoginUser(@RequestBody String username, @RequestBody String password ) throws IllegalAccessException {
+    public Map<String,Object> getLoginUser(@RequestBody String username, @RequestBody String password ) {
         return userService.login(username, password);
     }
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/users")
-    public void signUp(@RequestBody String username, @RequestBody String password) throws IllegalAccessException {
+    public void signUp(@RequestBody String username, @RequestBody String password) {
         userService.signUp(username, password);
     }
 
@@ -64,5 +64,42 @@ public class UserController {
     public double getProfit(@PathVariable String userId) {
         return userService.getUserProfit(userId);
     }
+
+    @DeleteMapping("users/{userId}/watchlist/{symbol}")
+    public  List<Map<String,Object>> removeStockFromWatchlist(@PathVariable String userId, @PathVariable String symbol) {
+        return userService.removeStockFromWatchlist(userId,symbol);
+    }
+
+    @DeleteMapping("users/{userId}/stocks/{symbol}")
+    public List<Map<String,Object>> removeStockFromUser(@PathVariable String userId, @PathVariable String symbol) {
+        return userService.removeStockFromUser(userId,symbol);
+    }
+
+    @GetMapping("users/{userId}/watchlist")
+    public List<Map<String,Object>> getUserWatchlist(@PathVariable String userId) {
+        return userService.getUserWatchlist(userId);
+    }
+
+    @GetMapping("users/{userId}/watchlistR")
+    public List<Map<String,Object>> refreshUserWatchlist(@PathVariable String userId) {
+        return userService.refreshWatchlistValues(userId);
+    }
+
+    @PostMapping("users/{userId}/stocks/{symbol}")
+    public List<Map<String,Object>> addStockToWatchlist(@PathVariable String userId, @PathVariable String symbol) {
+        return userService.addStockToWatchlist(userId,symbol);
+    }
+
+    @GetMapping("users/{userId}/portfolio/price")
+    public double getPortfolioPrice(@PathVariable String userId) {
+        return userService.getAmountPaid(userId);
+    }
+
+    @GetMapping("users/{userId}/portfolio/value")
+    public double getPortfolioValue(@PathVariable String userId) {
+        return userService.getPortfolioValue(userId);
+    }
+
+
 
 }
