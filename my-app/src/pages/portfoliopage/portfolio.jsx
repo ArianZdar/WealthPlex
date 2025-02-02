@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
+import { getPortfolioValue, addStockToWatchlist,removeStockFromWatchlist ,getUserWatchlist,getStocks,buyStock,sellStock} from '../../assets/utils/userRequests'
 
 function Portfolio() {
   const navigate = useNavigate();
@@ -9,66 +10,102 @@ function Portfolio() {
   const [error, setError] = useState(null); // Tracks errors
   const [newStockSymbol, setNewStockSymbol] = useState(""); // User input for stock/ETF symbol
 
-  const apiKey = "W8C3AGK5FBFV2BG3"; // Replace with your Alpha Vantage API key
 
-  // Function to fetch a stock/ETF by symbol
-  const fetchStockBySymbol = async (symbol) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Step 1: Use SYMBOL_SEARCH to find the correct asset
-      const searchResponse = await fetch(
-        `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${apiKey}`
-      );
-
-      const searchData = await searchResponse.json();
-
-      if (!searchData.bestMatches || searchData.bestMatches.length === 0) {
-        throw new Error(`Symbol "${symbol}" not found.`);
-      }
-
-      // Extract the best match from the search results
-      const bestMatch = searchData.bestMatches[0]["1. symbol"];
-
-      // Step 2: Fetch real-time price data using the matched symbol
-      const quoteResponse = await fetch(
-        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${bestMatch}&apikey=${apiKey}`
-      );
-
-      const quoteData = await quoteResponse.json();
-      const stockData = quoteData["Global Quote"];
-
-      if (!stockData || !stockData["05. price"]) {
-        throw new Error(`Could not retrieve data for "${bestMatch}".`);
-      }
-
-      // Step 3: Format the new stock/ETF entry
-      const newStock = {
-        name: bestMatch,
-        price: `$${parseFloat(stockData["05. price"]).toFixed(2)}`,
-        change: `${parseFloat(stockData["10. change percent"]).toFixed(2)}%`,
-        isPositive: parseFloat(stockData["09. change"]) >= 0,
-      };
-
-      // Step 4: Add to state
-      setStocks((prevStocks) => [...prevStocks, newStock]);
-      setNewStockSymbol(""); // Clear input field
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   // Function to handle adding a stock/ETF when user clicks "Add Stock"
-  const handleAddStock = (e) => {
+  const [watchlist, setWatchlist] = useState([]);
+  const [stocklist, setStocklist] = useState([]);
+  
+  const handleAddStock = async (e) => {
     e.preventDefault();
     if (!newStockSymbol.trim()) {
       setError("Please enter a valid stock or ETF symbol.");
       return;
     }
-    fetchStockBySymbol(newStockSymbol.toUpperCase());
+    const username = localStorage.getItem("loggedInUsername");
+
+    try {
+      // Call addStockToWatchlist and wait for the response
+      const updatedWatchlist = await addStockToWatchlist(username, newStockSymbol);
+      setWatchlist(updatedWatchlist); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+  };
+
+  const handleBuyStock = async (symbol, quantity, price) => {
+    const username = localStorage.getItem("loggedInUsername");
+    const roundedPrice = Math.round(parseFloat(price)) || 0; 
+    try {
+      // Call addStockToWatchlist and wait for the response
+      const updatedPortfolio = await buyStock(username,quantity,symbol,roundedPrice);
+      setStocklist(updatedPortfolio); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+
+  };
+
+  const handleRemoveStockFromWatchlist = async (e) => {
+    const username = localStorage.getItem("loggedInUsername");
+
+    try {
+      // Call addStockToWatchlist and wait for the response
+      const updatedWatchlist = await removeStockFromWatchlist(username, e);
+      setWatchlist(updatedWatchlist); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+  };
+
+
+  const handleGetWatchlist = async (e) => {
+    
+    const username = localStorage.getItem("loggedInUsername");
+
+    try {
+      const updatedWatchlist = await getUserWatchlist(username);
+      setWatchlist(updatedWatchlist); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+
+    try {
+
+      const updatedPortfolio = await getStocks(username);
+      console.log(updatedPortfolio);
+      setStocks(updatedPortfolio); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+  };
+
+  
+
+  const handleQuantityChange = (index, value) => {
+    const updatedWatchlist = [...watchlist];
+    updatedWatchlist[index].quantity = value;
+    setWatchlist(updatedWatchlist);
+  };
+  
+  const handlePriceChange = (index, value) => {
+    const updatedWatchlist = [...watchlist];
+    updatedWatchlist[index].price = value;
+    setWatchlist(updatedWatchlist);
+  };
+
+  const handleSellStock = async (symbol, quantity) => {
+    const username = localStorage.getItem("loggedInUsername");
+    
+    try {
+      // Call addStockToWatchlist and wait for the response
+      const updatedPortfolio = await sellStock(username,quantity,symbol);
+      setStocklist(updatedPortfolio); // Update watchlist with the new list
+    } catch (error) {
+      setError("Failed to add stock to watchlist: " + error.message);
+    }
+
   };
 
   return (
@@ -80,51 +117,133 @@ function Portfolio() {
       </div>
 
       {/* Add Stock Form */}
-      <div className="add-stock-section">
-        <form className="add-stock-form" onSubmit={handleAddStock}>
-          <input
-            type="text"
-            placeholder="Enter Stock/ETF Symbol (e.g., AAPL, VFV)"
-            value={newStockSymbol}
-            onChange={(e) => setNewStockSymbol(e.target.value)}
-          />
-          <button type="submit" className="add-stock-button">Add Stock</button>
-        </form>
-        {error && <p className="error-message">{error}</p>}
-      </div>
+      <div className="add-stock-container">
+ 
 
-      {/* Stock Holdings Table */}
-      <div className="stock-table-section">
-        {loading ? (
-          <p>Loading stocks...</p>
-        ) : (
-          <table className="stock-table">
-            <thead>
-              <tr>
-                <th>Stock/ETF</th>
-                <th>Price</th>
-                <th>Change</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stocks.map((stock, index) => (
-                <tr key={index}>
-                  <td className="stock-name">{stock.name}</td>
-                  <td className="stock-price">{stock.price}</td>
-                  <td
-                    className={`stock-change ${
-                      stock.isPositive ? 'positive' : 'negative'
-                    }`}
-                  >
-                    {stock.change}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+  <div className="add-stock-section">
+    <form className="add-stock-form" onClick={handleAddStock}>
+    <button className="add-stock-button" onClick={handleGetWatchlist}>
+    Refresh
+  </button>
+      <input
+        type="text"
+        placeholder="Enter Stock/ETF Symbol (e.g., AAPL, VFV)"
+        value={newStockSymbol}
+        onChange={(e) => setNewStockSymbol(e.target.value)}
+      />
+      <button type="submit" className="add-stock-button">Add Stock</button>
+    </form>
+ 
+    {error && <p className="error-message">{error}</p>}
+  </div>
+</div>
+
+      
+<div className="tables-container">
+  {/* WatchList Table */}
+  <div className="stock-table-section">
+    {loading ? (
+      <p>Loading stocks...</p>
+    ) : (
+      <table className="stock-table">
+        <thead>
+          <tr>
+            <th>Stock/ETF</th>
+            <th>Price</th>
+            <th>Change</th>
+            <th>Actions</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {watchlist.map((stock, index) => (
+            <tr key={index}>
+              <td className="stock-name">{stock.symbol}</td>
+              <td className="stock-price">{stock.currentPrice}</td>
+              <td className={`stock-change ${stock.isPositive ? 'positive' : 'negative'}`}>
+                {stock.change}
+              </td>
+              <td className="stock-actions">
+                <div className="actions-container">
+                  <input
+                    type="number"
+                    onChange={(e) => handleQuantityChange(index, e.target.value)}
+                    min="0"
+                    className="input-field"
+                    placeholder="Enter quantity"
+                  />
+                  <input
+                    type="number"
+                    onChange={(e) => handlePriceChange(index, e.target.value)}
+                    min="0"
+                    className="input-field"
+                    placeholder="Enter price"
+                  />
+                  <button className="buy-button" onClick={() => handleBuyStock(stock.symbol, stock.quantity, stock.price)}>Buy</button>
+                </div>
+              </td>
+              <td>
+                <button onClick={() => handleRemoveStockFromWatchlist(stock.symbol)} className="remove-button">
+                  Remove
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  {/* Portfolio Holdings Table */}
+  <div className="holding-table-section">
+    <table className="holding-table">
+      <thead>
+        <tr>
+          <th>Stock/ETF</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>CurrentPrice</th>
+          <th>Sell</th>
+        </tr>
+      </thead>
+    </table>
+    <tbody>
+    {stocklist.map((stock, index) => (
+            <tr key={index}>
+              <td className="stock-name">{stock.symbol}</td>
+              <td className="stock-price">{stock.price}</td>
+              <td className={`stock-amount `}>{stock.amount}</td>
+              <td className="stock-actions">
+                <div className="actions-container">
+                  <input
+                    type="number"
+                    onChange={(e) => handleQuantityChange(index, e.target.value)}
+                    min="0"
+                    className="input-field"
+                    placeholder="Enter quantity"
+                  />
+                  <input
+                    type="number"
+                    onChange={(e) => handlePriceChange(index, e.target.value)}
+                    min="0"
+                    className="input-field"
+                    placeholder="Enter price"
+                  />
+                  <button className="sell-button" onClick={() => handleSellStock(stock.symbol, stock.quantity, stock.price)}>Sell</button>
+                </div>
+              </td>
+              <td>
+                <button onClick={() => handleRemoveStockFromWatchlist(stock.symbol)} className="remove-button">
+                  Remove
+                </button>
+              </td>
+            </tr>
+          ))}
+      </tbody>
+  </div>
+</div>
+</div>
+     
   );
 }
 

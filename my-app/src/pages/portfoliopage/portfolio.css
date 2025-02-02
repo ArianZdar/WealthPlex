@@ -51,7 +51,7 @@
 .add-stock-section {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;;
     margin-bottom: 0px;
     width: 100%;
     position: absolute;
@@ -72,7 +72,17 @@
     transform: translate(-50%, -50%);
     height: 12; 
     padding: 20px; 
+    gap: 10px;
 }
+
+.add-stock-container {
+    display: flex;
+    justify-content: space-between; /* Moves elements to opposite ends */
+    align-items: center; /* Aligns vertically */
+    width: 100%; /* Ensures full width */
+    padding: 10px 0; /* Adds spacing */
+  }
+  
 
 .add-stock-form input {
     flex: 1;
@@ -116,29 +126,63 @@
     margin-top: 10px;
 }
 
-.stock-table {
-    width: 100%; 
-    max-width: 100%; 
+.tables-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 20px; 
+    width: 100%; /* Ensure it spans full width */
+    max-width: 100vw; /* Prevents any unwanted shrinking */
+    padding: 20px; /* Adds spacing */
+}
+
+
+.stock-table-section, .holding-table-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+ .holding-table {
+    width: 120%; 
+    max-width: 120%; 
     border-collapse: collapse;
     background: rgba(3, 31, 9, 0.8);
     color: #fff;
     border-radius: 0px;
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    position: absolute; 
-    top: 20%; 
-    left: 50%; 
+
     transform: translate(-50%, -50%); 
+  }
+  
+
+  
+  .buy-button, .remove-button {
+    padding: 8px 12px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+
+.stock-table {
+    width: 100%; /* Ensure full width */
+    max-width: 100%; /* Prevent limiting width */
+    border-collapse: collapse;
+    background: rgba(3, 31, 9, 0.8);
+    color: #fff;
+    border-radius: 0px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    margin: 0 auto; /* Center the table */
+    transform: translate(-50%, -50%);  /* Remove transformation */
 }
 
-
-.stock-table thead {
+.stock-table thead, holding-table thead {
     background: #024117;
     color: #e5ffe5;
 }
 
-.stock-table th,
-.stock-table td {
+stock-table th, .holding-table th,
+stock-table td, .holding-table td {
     padding: 10px;
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -167,7 +211,35 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.remove-button {
+    height: 40px;
+    background: linear-gradient(95deg, #572020, #b60b05);
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    border-radius: 10px;
+    left: 100;
+    padding: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    line-height: 0px;
+}
+
 .back-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
+
+.actions-container {
+    display: flex;
+    align-items: center; /* Align the items vertically in the center */
+    gap: 10px; /* Add space between each element */
+  }
+  
+  .input-field {
+    width: 100px; /* Set width of the input fields */
+    padding: 5px;
+    text-align: center; /* Center the numbers inside the input field */
+  }
+  
