@@ -16,7 +16,7 @@ const Registration = () => {
 
 
     const handleRegister = async () => {
-        try {
+    try {
         await signup(username, password);
     } catch (error) {
         console.error("Login failed:", error.message);

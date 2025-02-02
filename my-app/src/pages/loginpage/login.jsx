@@ -4,22 +4,24 @@ import { FaLock } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { login } from '../../assets/utils/userRequests'
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    // State to store the username/email and password
+    const navigate = useNavigate(); 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loggedInUsername, setLoggedInUsername] = useState(''); // Use state for logged-in username
   
-    // Function to handle the login button click
+
     const handleLogin = async (e) => {
-        e.preventDefault(); // Prevent form submission refresh
+        e.preventDefault();
         try {
-            const response = await login(username, password); // Call the login function with actual username/password
+            const response = await login(username, password); 
             if (response) {
-                setLoggedInUsername(username); // Set logged-in username in state
+    
                 console.log("Login successful:", response);
-                // Handle successful login, redirect user or display message
+                navigate("/portfolio"); 
+                localStorage.setItem("loggedInUsername", username);
+            
             } else {
                 console.log("Login failed: Invalid credentials");
             }
