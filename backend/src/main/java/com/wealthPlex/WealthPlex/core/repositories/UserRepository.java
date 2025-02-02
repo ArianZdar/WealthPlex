@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Repository
 public class UserRepository extends DocumentRepository {
 
@@ -31,7 +32,7 @@ public class UserRepository extends DocumentRepository {
         userMap.put("username", user.getUsername());
         userMap.put("password", user.getPassword());
         userMap.put("isLongTermInvestor", user.isLongTermInvestor());
-
+        userMap.put("profit",user.getProfit());
         List<Map<String,Object>> stocks = user.getStocks().stream()
                 .map(this::getStockAsMap).toList();
         userMap.put("stocks", stocks);
@@ -43,6 +44,7 @@ public class UserRepository extends DocumentRepository {
     public DocumentData getFromMap(Map<String, Object> map) {
         User user = new User();
         user.setId(map.get("id").toString());
+        user.setProfit(Double.parseDouble(map.get("profit").toString()));
         user.setUsername(map.get("username").toString());
         user.setPassword(map.get("password").toString());
         user.setLongTermInvestor((Boolean) map.get("isLongTermInvestor"));
@@ -70,7 +72,7 @@ public class UserRepository extends DocumentRepository {
     public Stock getStockFromMap(Map<String, Object> map) {
         Stock stock = new Stock();
         stock.setSymbol((String) map.get("symbol"));
-        stock.setAmount(Double.parseDouble(map.get("amount").toString()));
+        stock.setAmount(Integer.parseInt(map.get("amount").toString()));
         stock.setPrice(Double.parseDouble(map.get("price").toString()));
         return stock;
     }

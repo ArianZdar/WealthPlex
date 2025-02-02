@@ -7,5 +7,5 @@ import lombok.Data;
 public class Stock {
     private String symbol;
     private double price;
-    private double amount;
+    private int amount;
 }
