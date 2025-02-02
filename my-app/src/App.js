@@ -5,6 +5,7 @@ import Greeting from './components/greeting';
 import Home from './pages/homepage/home';
 import Portfolio from './pages/portfoliopage/portfolio'
 import Login from './pages/loginpage/login'
+import StockInfo from './pages/stockinfopage/stockinfo'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/stockinfo" element={<StockInfo />} />
         </Routes>
       </div>
     </Router>

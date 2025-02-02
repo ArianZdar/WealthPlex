@@ -1,20 +1,19 @@
 /* General Styling */
-body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background-image: #FAFAFA; /* Light background */
-    color: #333;
-}
+
 
 /* Portfolio Container */
 .portfolio-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
+    max-width: 1100px; /* Increase width */
+    min-height: 80vh; /* Make it take up most of the screen */
+    margin: auto;
+    padding: 40px;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribute content evenly */
 }
 
 /* Portfolio Balance */
@@ -22,7 +21,7 @@ body {
     margin-bottom: 20px;
     padding: 20px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #0057FF, #003FCC); /* Wealthsimple blue gradient */
+    background: linear-gradient(135deg, #5D8736, #5D8736); /* Wealthsimple blue gradient */
     color: white;
     box-shadow: 0 4px 12px rgba(0, 87, 255, 0.2);
 }
@@ -30,6 +29,7 @@ body {
 .balance-title {
     font-size: 1.2rem;
     font-weight: 500;
+    color: white;
 }
 
 .balance-amount {
@@ -79,7 +79,7 @@ body {
     font-size: 1rem;
     font-weight: bold;
     color: white;
-    background: #0057FF;
+    background: #85A947;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -87,5 +87,5 @@ body {
 }
 
 .back-button:hover {
-    background: #003FCC;
+    background: #3E7B27;
 }
