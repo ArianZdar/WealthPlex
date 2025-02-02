@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import io.github.cdimascio.dotenv.Dotenv;
 
-
 @Service
 public class OpenAIStockRating {
     private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
@@ -24,16 +23,10 @@ public class OpenAIStockRating {
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
     private static final String ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
 
+    // ✅ Static block to print API keys during class loading
     static {
-        if (OPENAI_API_KEY == null || OPENAI_API_KEY.isEmpty()) {
-            throw new RuntimeException("❌ Missing OpenAI API Key. Check your .env file.");
-        }
-        if (ALPHA_VANTAGE_API_KEY == null || ALPHA_VANTAGE_API_KEY.isEmpty()) {
-            throw new RuntimeException("❌ Missing Alpha Vantage API Key. Check your .env file.");
-        }
-
-        System.out.println("✅ OpenAI API Key Loaded");
-        System.out.println("✅ Alpha Vantage API Key Loaded");
+        System.out.println("✅ OpenAI API Key: " + OPENAI_API_KEY);
+        System.out.println("✅ Alpha Vantage API Key: " + ALPHA_VANTAGE_API_KEY);
     }
 
     public String getStockRating(String stockSymbol, String username) throws IOException {
@@ -68,9 +61,10 @@ public class OpenAIStockRating {
         requestBody.put("model", "gpt-3.5-turbo");
         requestBody.put("messages", new Object[]{
             new JSONObject().put("role", "system").put("content", 
-                "You are an AI stock analyst. You provide two paragraphs explaining why the stock received its rating, "
-                + "mentioning key factors such as volatility, fundamentals, market sentiment, "
-                + "and upcoming earnings events. Also, discuss analyst expectations and recent news-driven targets."),
+                "You are a financial analyst. Given stock data, provide a **detailed** analysis in 1-2 paragraphs. " +
+                "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
+                "Mention recent news that may impact the stock price, whether positively or negatively. " +
+                "Do not give a simple rating, but a **full analysis**."),
             new JSONObject().put("role", "user").put("content",
                 "Stock: " + stockSymbol + ", Price: $" + price +
                 ", Volatility: " + volatility + ", User: " + username)
@@ -99,8 +93,7 @@ public class OpenAIStockRating {
         }
 
         JSONObject quote = json.getJSONObject("Global Quote");
-        String priceStr = quote.optString("05. price", "");
-        return priceStr.isEmpty() ? null : new BigDecimal(priceStr);
+        return new BigDecimal(quote.optString("05. price", "0"));
     }
 
     private String sendOpenAIRequest(JSONObject requestBody, boolean extractRatingOnly) throws IOException {
@@ -113,23 +106,24 @@ public class OpenAIStockRating {
                 .build();
     
         Response response = client.newCall(request).execute();
-        if (!response.isSuccessful() || response.body() == null) {
+    
+        if (!response.isSuccessful()) {
+            System.out.println("❌ OpenAI API Error: " + response.code() + " - " + response.message());
+            System.out.println("🔍 Response Body: " + (response.body() != null ? response.body().string() : "null"));
             return "Error: Failed to get response from AI.";
         }
-
-        String responseBody = response.body().string();
-        JSONObject responseJson = new JSONObject(responseBody);
+    
+        JSONObject responseJson = new JSONObject(response.body().string());
         String content = responseJson.getJSONArray("choices")
                                      .getJSONObject(0)
                                      .getJSONObject("message")
-                                     .optString("content", "Error: No content received.");
+                                     .getString("content");
     
         return extractRatingOnly ? extractStockRating(content) : content;
     }
-
+    
     private String extractStockRating(String aiResponse) {
-        String rating = aiResponse.replaceAll(".*?(\\b\\d+/\\d+\\b).*", "$1");
-        return rating.isEmpty() ? "N/A" : rating;
+        return aiResponse.replaceAll(".*?(\\b\\d+/\\d+\\b).*", "$1");
     }
 
     private BigDecimal getVolatility() {
