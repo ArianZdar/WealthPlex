@@ -26,49 +26,52 @@
     margin-bottom: 30px;
     width: 100%;
     max-width: 600px;
+    height:170px;
 
-    /* Positioning properties */
-    position: absolute; /* Allows you to control the exact position */
-    top: 8%; /* Adjust vertical position */
-    left: 20%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Centers the element */
+    
+    position: absolute; 
+    top: 10%; 
+    left: 18%;
+    transform: translate(-50%, -50%); 
 }
 
 .balance-title {
-    font-size: 20px;
+    font-size: 32px;
     font-weight: 600;
     color: #e5ffe5;
-    margin-bottom: 5px;
+    margin-bottom: 30px;
 }
 
 .balance-amount {
-    font-size: 36px;
+    font-size: 46px;
     font-weight: bold;
-    color: #ffffff;
+    color: hsl(0, 0%, 100%);
 }
 
 .add-stock-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     width: 100%;
-    max-width: 600px; 
     position: absolute;
-    top: 20; 
-    left: 70%; 
+    top: 15%; 
+    left: 52%; 
     transform: translate(-50%, -50%);
-
-    /* Dynamic size control */
-    height: auto; /* Let content determine height, but you can set a value */
-    padding: 20px; /* Optional: Add padding */
+    height: auto; 
+    padding: 20px; 
 }
 
 
 .add-stock-form {
     display: flex;
-    gap: 10px;
-    width: 100%;
+    width: 50%;
+    position: absolute;
+    top: 12%; 
+    left: 67%; 
+    transform: translate(-50%, -50%);
+    height: 12; 
+    padding: 20px; 
 }
 
 .add-stock-form input {
@@ -80,7 +83,7 @@
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
     outline: none;
-    font-size: 14px;
+    font-size: 22px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -89,16 +92,16 @@
     box-shadow: 0 0 6px rgba(4, 93, 35, 0.5);
 }
 
-.add-stock-form .add-stock-button {
-    height: 40px;
+.add-stock-button {
+    height: 70px;
     background: linear-gradient(95deg, #163b2c, #024117);
     border: none;
     color: #fff;
     font-weight: bold;
-    font-size: 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    padding: 0 20px;
+    font-size: 20px;
+    border-radius: 10px;
+    left: 100;
+    padding: 20px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -114,16 +117,20 @@
 }
 
 .stock-table {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto 30px;
+    width: 100%; 
+    max-width: 100%; 
     border-collapse: collapse;
     background: rgba(3, 31, 9, 0.8);
     color: #fff;
-    border-radius: 10px;
+    border-radius: 0px;
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    position: absolute; 
+    top: 20%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
 }
+
 
 .stock-table thead {
     background: #024117;
@@ -146,8 +153,10 @@
 }
 
 .back-button {
-    margin-top: 20px;
-    padding: 10px 20px;
+    margin-top: 800px;
+    left:150px;
+    height:100px;
+    padding: 20px;
     background: linear-gradient(95deg, #163b2c, #024117);
     border: none;
     color: #fff;

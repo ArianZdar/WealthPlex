@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
 
-
 function Portfolio() {
   const navigate = useNavigate();
   const [stocks, setStocks] = useState([]); // Holds stock & ETF data
@@ -10,8 +9,7 @@ function Portfolio() {
   const [error, setError] = useState(null); // Tracks errors
   const [newStockSymbol, setNewStockSymbol] = useState(""); // User input for stock/ETF symbol
 
-  // const apiKey = "9OT3J033U7E547OP"; // Replace with your Alpha Vantage API key
-  const apiKey = "W8C3AGK5FBFV2BG3"; 
+  const apiKey = "W8C3AGK5FBFV2BG3"; // Replace with your Alpha Vantage API key
 
   // Function to fetch a stock/ETF by symbol
   const fetchStockBySymbol = async (symbol) => {
@@ -19,9 +17,7 @@ function Portfolio() {
       setLoading(true);
       setError(null);
 
-
-
-      // Step 1: Use SYMBOL_SEARCH to find the correct asset (useful for ETFs like VFV)
+      // Step 1: Use SYMBOL_SEARCH to find the correct asset
       const searchResponse = await fetch(
         `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${apiKey}`
       );
@@ -49,7 +45,7 @@ function Portfolio() {
 
       // Step 3: Format the new stock/ETF entry
       const newStock = {
-        name: bestMatch, // Use the best-matched symbol (e.g., VFV.TO)
+        name: bestMatch,
         price: `$${parseFloat(stockData["05. price"]).toFixed(2)}`,
         change: `${parseFloat(stockData["10. change percent"]).toFixed(2)}%`,
         isPositive: parseFloat(stockData["09. change"]) >= 0,
@@ -84,49 +80,50 @@ function Portfolio() {
       </div>
 
       {/* Add Stock Form */}
-      <form className="add-stock-form" onSubmit={handleAddStock}>
-        <input
-          type="text"
-          placeholder="Enter Stock/ETF Symbol (e.g., AAPL, VFV)"
-          value={newStockSymbol}
-          onChange={(e) => setNewStockSymbol(e.target.value)}
-        />
-        <button type="submit" className="add-stock-button">Add Stock</button>
-      </form>
-
-      {/* Show error messages */}
-      {error && <p className="error-message">{error}</p>}
+      <div className="add-stock-section">
+        <form className="add-stock-form" onSubmit={handleAddStock}>
+          <input
+            type="text"
+            placeholder="Enter Stock/ETF Symbol (e.g., AAPL, VFV)"
+            value={newStockSymbol}
+            onChange={(e) => setNewStockSymbol(e.target.value)}
+          />
+          <button type="submit" className="add-stock-button">Add Stock</button>
+        </form>
+        {error && <p className="error-message">{error}</p>}
+      </div>
 
       {/* Stock Holdings Table */}
-      {loading ? (
-        <p>Loading stocks...</p>
-      ) : (
-        <table className="stock-table">
-          <thead>
-            <tr>
-              <th>Stock/ETF</th>
-              <th>Price</th>
-              <th>Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stocks.map((stock, index) => (
-              <tr key={index}>
-                <td className="stock-name">{stock.name}</td>
-                <td className="stock-price">{stock.price}</td>
-                <td className={`stock-change ${stock.isPositive ? 'positive' : 'negative'}`}>
-                  {stock.change}
-                </td>
+      <div className="stock-table-section">
+        {loading ? (
+          <p>Loading stocks...</p>
+        ) : (
+          <table className="stock-table">
+            <thead>
+              <tr>
+                <th>Stock/ETF</th>
+                <th>Price</th>
+                <th>Change</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* Back to Home Button */}
-      <button className="back-button" onClick={() => navigate('/')}>
-        Back to Home
-      </button>
+            </thead>
+            <tbody>
+              {stocks.map((stock, index) => (
+                <tr key={index}>
+                  <td className="stock-name">{stock.name}</td>
+                  <td className="stock-price">{stock.price}</td>
+                  <td
+                    className={`stock-change ${
+                      stock.isPositive ? 'positive' : 'negative'
+                    }`}
+                  >
+                    {stock.change}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
