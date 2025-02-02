@@ -12,5 +12,6 @@ public class User extends DocumentData {
     String password;
     boolean isLongTermInvestor;
     List<Stock> stocks = new ArrayList<>();
+    List<WatchedStock> watchlist = new ArrayList<>();
     Double profit;
 }
