@@ -6,45 +6,55 @@ function Portfolio() {
   const navigate = useNavigate();
 
   const [stocks, setStocks] = useState([]); // Holds stock data
-  const [loading, setLoading] = useState(true); // Tracks loading state
+  const [loading, setLoading] = useState(false); // Tracks loading state
   const [error, setError] = useState(null); // Tracks errors
+  const [newStockSymbol, setNewStockSymbol] = useState(""); // Tracks user input for new stock
 
-  useEffect(() => {
-    fetchStocks(); // Fetch stocks when the component loads
-  }, []);
+  const apiKey = "W8C3AGK5FBFV2BG3"; // Replace with your Alpha Vantage API key
 
-  const fetchStocks = async () => {
+  // Function to fetch a single stock by symbol
+  const fetchStockBySymbol = async (symbol) => {
     try {
-      const stockSymbols = ["AAPL", "TSLA", "AMZN", "MSFT"]; // Stocks to fetch
-      const apiKey = "W8C3AGK5FBFV2BG3"; // Replace with your Alpha Vantage API key
-      const fetchedStocks = [];
+      setLoading(true);
+      setError(null); // Clear previous errors
 
-      for (const symbol of stockSymbols) {
-        const response = await fetch(
-          `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`
-        );
+      const response = await fetch(
+        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`
+      );
 
-        if (!response.ok) throw new Error(`Failed to fetch stock data for ${symbol}`);
+      if (!response.ok) throw new Error(`Failed to fetch stock data for ${symbol}`);
 
-        const data = await response.json();
-        const stockData = data["Global Quote"];
+      const data = await response.json();
+      const stockData = data["Global Quote"];
 
-        if (stockData) {
-          fetchedStocks.push({
-            name: `${symbol}`, // Stock symbol
-            price: `$${parseFloat(stockData["05. price"]).toFixed(2)}`, // Current stock price
-            change: `${parseFloat(stockData["10. change percent"]).toFixed(2)}%`, // Change percentage
-            isPositive: parseFloat(stockData["09. change"]) >= 0, // Positive or negative change
-          });
-        }
+      if (!stockData || !stockData["05. price"]) {
+        throw new Error(`Stock symbol "${symbol}" not found.`);
       }
 
-      setStocks(fetchedStocks); // Update the stocks state
+      const newStock = {
+        name: stockData["01. symbol"],
+        price: `$${parseFloat(stockData["05. price"]).toFixed(2)}`,
+        change: `${parseFloat(stockData["10. change percent"]).toFixed(2)}%`,
+        isPositive: parseFloat(stockData["09. change"]) >= 0,
+      };
+
+      setStocks((prevStocks) => [...prevStocks, newStock]); // Add new stock to list
+      setNewStockSymbol(""); // Clear input field
     } catch (err) {
-      setError(err.message); // Set error if fetching fails
+      setError(err.message);
     } finally {
-      setLoading(false); // Stop loading spinner
+      setLoading(false);
     }
+  };
+
+  // Function to handle adding a new stock
+  const handleAddStock = (e) => {
+    e.preventDefault();
+    if (!newStockSymbol.trim()) {
+      setError("Please enter a valid stock symbol.");
+      return;
+    }
+    fetchStockBySymbol(newStockSymbol.toUpperCase());
   };
 
   return (
@@ -55,11 +65,23 @@ function Portfolio() {
         <h1 className="balance-amount">$12,450.23</h1>
       </div>
 
+      {/* Add Stock Form */}
+      <form className="add-stock-form" onSubmit={handleAddStock}>
+        <input
+          type="text"
+          placeholder="Enter Stock Symbol (e.g., AAPL)"
+          value={newStockSymbol}
+          onChange={(e) => setNewStockSymbol(e.target.value)}
+        />
+        <button type="submit" className="add-stock-button">Add Stock</button>
+      </form>
+
+      {/* Show error messages */}
+      {error && <p className="error-message">{error}</p>}
+
       {/* Stock Holdings Table */}
       {loading ? (
         <p>Loading stocks...</p>
-      ) : error ? (
-        <p className="error-message">{error}</p>
       ) : (
         <table className="stock-table">
           <thead>
