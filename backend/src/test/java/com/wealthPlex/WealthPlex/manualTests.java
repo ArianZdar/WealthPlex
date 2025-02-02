@@ -30,6 +30,7 @@ class manualTests {
 		user.setPassword("admin");
 		user.setId("admin");
 		user.setStocks(List.of(newStock));
+		user.setProfit(0.0D);
 		userRepository.saveDocumentWithId(user.getId(),user);
 		Stock newStock2 = new Stock();
 		newStock2.setPrice(25.0D);
