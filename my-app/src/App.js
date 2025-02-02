@@ -6,18 +6,18 @@ import Home from './pages/homepage/home';
 import Portfolio from './pages/portfoliopage/portfolio'
 import Login from './pages/loginpage/login'
 import StockInfo from './pages/stockinfopage/stockinfo'
+import Register from './pages/RegistrationPage/registration';
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/stockinfo" element={<StockInfo />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registration" element={<Register />} />
+        <Route path="/stockinfo" element={<StockInfo />} />
+      </Routes>
     </Router>
   );
 }
