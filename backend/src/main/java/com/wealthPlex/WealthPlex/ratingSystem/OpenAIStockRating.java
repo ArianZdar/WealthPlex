@@ -1,27 +1,48 @@
 package com.wealthPlex.WealthPlex.ratingSystem;
 
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 import org.json.JSONObject;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
+import io.github.cdimascio.dotenv.Dotenv;
+
 
 @Service
 public class OpenAIStockRating {
+    private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
 
-    private static final String OPENAI_API_KEY = System.getenv("OPENAI_API_KEY"); // Use env variable
+    private static final Dotenv dotenv = Dotenv.configure()
+        .directory(ENV_PATH)  // Set directory explicitly
+        .ignoreIfMalformed()  
+        .ignoreIfMissing()    
+        .load();
+
+    private static final String OPENAI_API_KEY = dotenv.get("OPENAI_API_KEY");
+    private static final String ALPHA_VANTAGE_API_KEY = dotenv.get("ALPHA_VANTAGE_API_KEY"); 
+
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
+
+    static {
+        if (OPENAI_API_KEY == null || OPENAI_API_KEY.isEmpty()) {
+            throw new RuntimeException("❌ Missing OpenAI API Key. Check your .env file.");
+        }
+        if (ALPHA_VANTAGE_API_KEY == null || ALPHA_VANTAGE_API_KEY.isEmpty()) {
+            throw new RuntimeException("❌ Missing Alpha Vantage API Key. Check your .env file.");
+        }
+
+        System.out.println("✅ OpenAI API Key Loaded");
+        System.out.println("✅ Alpha Vantage API Key Loaded");
+    }
 
     public String getStockRating(String stockSymbol, String username) throws IOException {
-        Stock stock = YahooFinance.get(stockSymbol);
-        if (stock == null || stock.getQuote() == null) {
+        BigDecimal price = getStockPrice(stockSymbol);
+        if (price == null) {
             return "Error: Unable to fetch stock data for " + stockSymbol;
         }
 
-        BigDecimal price = stock.getQuote().getPrice();
-        BigDecimal volatility = getVolatility(stock);
+        BigDecimal volatility = getVolatility();
 
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", "gpt-3.5-turbo");
@@ -32,17 +53,16 @@ public class OpenAIStockRating {
                 ", Volatility: " + volatility + ", User: " + username)
         });
 
-        return sendOpenAIRequest(requestBody, true); // Extract only rating
+        return sendOpenAIRequest(requestBody, true);
     }
 
     public String getStockExplanation(String stockSymbol, String username) throws IOException {
-        Stock stock = YahooFinance.get(stockSymbol);
-        if (stock == null || stock.getQuote() == null) {
+        BigDecimal price = getStockPrice(stockSymbol);
+        if (price == null) {
             return "Error: Unable to fetch stock data for " + stockSymbol;
         }
 
-        BigDecimal price = stock.getQuote().getPrice();
-        BigDecimal volatility = getVolatility(stock);
+        BigDecimal volatility = getVolatility();
 
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", "gpt-3.5-turbo");
@@ -56,39 +76,63 @@ public class OpenAIStockRating {
                 ", Volatility: " + volatility + ", User: " + username)
         });
 
-        return sendOpenAIRequest(requestBody, false); // Return full AI response
+        return sendOpenAIRequest(requestBody, false);
     }
 
-    
-    //Sends a request to OpenAI and returns either the rating or full explanation.
+    private BigDecimal getStockPrice(String stockSymbol) throws IOException {
+        String url = ALPHA_VANTAGE_URL + stockSymbol + "&apikey=" + ALPHA_VANTAGE_API_KEY;
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful() || response.body() == null) {
+            return null;
+        }
+
+        JSONObject json = new JSONObject(response.body().string());
+        if (!json.has("Global Quote")) {
+            return null;
+        }
+
+        JSONObject quote = json.getJSONObject("Global Quote");
+        String priceStr = quote.optString("05. price", "");
+        return priceStr.isEmpty() ? null : new BigDecimal(priceStr);
+    }
+
     private String sendOpenAIRequest(JSONObject requestBody, boolean extractRatingOnly) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-            .url(OPENAI_API_URL)
-            .post(RequestBody.create(requestBody.toString(), MediaType.parse("application/json")))
-            .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
-            .build();
-
+                .url(OPENAI_API_URL)
+                .post(RequestBody.create(requestBody.toString(), MediaType.parse("application/json")))
+                .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+                .addHeader("Content-Type", "application/json")
+                .build();
+    
         Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful() && response.body() != null) {
-            JSONObject responseJson = new JSONObject(response.body().string());
-            String content = responseJson.getJSONArray("choices")
-                                         .getJSONObject(0)
-                                         .getJSONObject("message")
-                                         .getString("content");
-
-            return extractRatingOnly ? extractStockRating(content) : content;
-        } else {
+        if (!response.isSuccessful() || response.body() == null) {
             return "Error: Failed to get response from AI.";
         }
+
+        String responseBody = response.body().string();
+        JSONObject responseJson = new JSONObject(responseBody);
+        String content = responseJson.getJSONArray("choices")
+                                     .getJSONObject(0)
+                                     .getJSONObject("message")
+                                     .optString("content", "Error: No content received.");
+    
+        return extractRatingOnly ? extractStockRating(content) : content;
     }
 
     private String extractStockRating(String aiResponse) {
-        return aiResponse.replaceAll(".*?(\\b\\d+/\\d+\\b).*", "$1");
+        String rating = aiResponse.replaceAll(".*?(\\b\\d+/\\d+\\b).*", "$1");
+        return rating.isEmpty() ? "N/A" : rating;
     }
 
-    private BigDecimal getVolatility(Stock stock) {
-        return BigDecimal.valueOf(Math.random() * 10); // Replace with real calculation
+    private BigDecimal getVolatility() {
+        return BigDecimal.valueOf(Math.random() * 10);
     }
 }
