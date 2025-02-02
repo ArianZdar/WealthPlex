@@ -25,6 +25,8 @@ function Portfolio() {
       if (!response.ok) throw new Error(`Failed to fetch stock data for ${symbol}`);
 
       const data = await response.json();
+      console.log("API Response:", data); // Debug: See what the API returns
+
       const stockData = data["Global Quote"];
 
       if (!stockData || !stockData["05. price"]) {
@@ -52,6 +54,10 @@ function Portfolio() {
     e.preventDefault();
     if (!newStockSymbol.trim()) {
       setError("Please enter a valid stock symbol.");
+      return;
+    }
+    if (!/^[A-Z]+$/.test(newStockSymbol.trim().toUpperCase())) {
+      setError("Stock symbols must contain only letters.");
       return;
     }
     fetchStockBySymbol(newStockSymbol.toUpperCase());

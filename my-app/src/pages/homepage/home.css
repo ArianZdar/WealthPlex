@@ -10,20 +10,52 @@ body {
     height: 100vh;
 }
 
+.features-container {
+    display: flex;
+    justify-content: space-between; /* Even spacing between columns */
+    gap: 20px; /* Space between columns */
+    padding: 20px 0;
+    border-top: 1px solid #ccc; /* Top border for the section */
+    border-bottom: 1px solid #ccc; /* Bottom border for the section */
+  }
+
+  .feature {
+    flex: 1; /* Equal width for all columns */
+    text-align: center; /* Center-align text */
+    padding: 0 10px; /* Add some padding inside columns */
+  }
+
+  .feature h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    transition: background-color 0.4s ease-in-out, transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out; 
+
+  }
+  .feature h3:hover {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    transform: scale(1.2);
+  }
+
+
 /* Container - Centered layout */
 .container {
     max-width: 900px;
     height: 40rem;
     text-align: center;
     padding: 3rem;
-    background: white;
+    background: #F2EFE5;
     border-radius: 16px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); /* Soft shadow */
     transition: transform 0.3s ease;
 }
 
 .container:hover {
-    transform: scale(1.02); /* Subtle hover effect */
+    transform: scale(1.02); 
 }
 
 /* Title Styling */
@@ -45,6 +77,7 @@ p {
 
 /* Wealthsimple-Inspired Button */
 .button {
+    margin-top: 1vw;
     display: inline-block;
     padding: 12px 24px;
     font-size: 1rem;
@@ -66,6 +99,8 @@ p {
 .button:active {
     transform: translateY(1px); /* Press effect */
 }
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
