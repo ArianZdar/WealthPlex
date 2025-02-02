@@ -7,7 +7,10 @@ import yahoofinance.histquotes.Interval;
 import okhttp3.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
 import org.springframework.stereotype.Service;
+=======
+>>>>>>> 39503fa0fbf0c5d0e69464d040ac3c01ddf13796
 
 import com.wealthPlex.WealthPlex.core.models.User;
 import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
@@ -20,7 +23,10 @@ import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.List;
 
+<<<<<<< HEAD
 @Service
+=======
+>>>>>>> 39503fa0fbf0c5d0e69464d040ac3c01ddf13796
 public class OpenAIStockRating {
 
     private static final String OPENAI_API_KEY = ""; // Replace with actual API key
@@ -133,7 +139,11 @@ public class OpenAIStockRating {
     private double getNetGain(String stockSymbol, String username) throws FileNotFoundException{
         double netGain=0;
         User user = (User) userRepository.getFromMap(userService.getUserByUsername(username));
+<<<<<<< HEAD
         
+=======
+        // then do net percent gain 
+>>>>>>> 39503fa0fbf0c5d0e69464d040ac3c01ddf13796
 
         return netGain;
     }
