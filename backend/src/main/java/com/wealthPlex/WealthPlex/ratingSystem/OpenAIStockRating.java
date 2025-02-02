@@ -12,41 +12,26 @@ public class OpenAIStockRating {
     private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
 
     private static final Dotenv dotenv = Dotenv.configure()
-        .directory(ENV_PATH)  // Set directory explicitly
-        .ignoreIfMalformed()  
-        .ignoreIfMissing()    
+        .directory(ENV_PATH)
+        .ignoreIfMalformed()
+        .ignoreIfMissing()
         .load();
 
     private static final String OPENAI_API_KEY = dotenv.get("OPENAI_API_KEY");
-    private static final String ALPHA_VANTAGE_API_KEY = dotenv.get("ALPHA_VANTAGE_API_KEY"); 
+    private static final String ALPHA_VANTAGE_API_KEY = dotenv.get("ALPHA_VANTAGE_API_KEY");
 
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
     private static final String ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
 
-    // ✅ Static block to print API keys during class loading
     static {
         System.out.println("✅ OpenAI API Key: " + OPENAI_API_KEY);
         System.out.println("✅ Alpha Vantage API Key: " + ALPHA_VANTAGE_API_KEY);
     }
 
+    // ✅ Now `getStockRating()` extracts rating from AI response
     public String getStockRating(String stockSymbol, String username) throws IOException {
-        BigDecimal price = getStockPrice(stockSymbol);
-        if (price == null) {
-            return "Error: Unable to fetch stock data for " + stockSymbol;
-        }
-
-        BigDecimal volatility = getVolatility();
-
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "gpt-3.5-turbo");
-        requestBody.put("messages", new Object[]{
-            new JSONObject().put("role", "system").put("content", "You are an AI that rates stocks."),
-            new JSONObject().put("role", "user").put("content",
-                "Stock: " + stockSymbol + ", Price: $" + price +
-                ", Volatility: " + volatility + ", User: " + username)
-        });
-
-        return sendOpenAIRequest(requestBody, true);
+        String fullResponse = getStockExplanation(stockSymbol, username);
+        return extractStockRating(fullResponse);  // Extracts only the rating from AI response
     }
 
     public String getStockExplanation(String stockSymbol, String username) throws IOException {
@@ -61,7 +46,7 @@ public class OpenAIStockRating {
         requestBody.put("model", "gpt-3.5-turbo");
         requestBody.put("messages", new Object[]{
             new JSONObject().put("role", "system").put("content", 
-                "You are a financial analyst. Given stock data, provide a **detailed** analysis in 1-2 paragraphs. " +
+                "You are a financial analyst. Given the stock name and the type of investor you are advising for (short term or long term), provide a **detailed** analysis in 1-2 paragraphs. You must also look on the internet for the company's financial performance, market trends, and growth prospects and conclude with a rating out of 10 on if this is good for the selected type of investor." +
                 "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
                 "Mention recent news that may impact the stock price, whether positively or negatively. " +
                 "Do not give a simple rating, but a **full analysis**."),
@@ -70,7 +55,7 @@ public class OpenAIStockRating {
                 ", Volatility: " + volatility + ", User: " + username)
         });
 
-        return sendOpenAIRequest(requestBody, false);
+        return sendOpenAIRequest(requestBody);
     }
 
     private BigDecimal getStockPrice(String stockSymbol) throws IOException {
@@ -96,7 +81,7 @@ public class OpenAIStockRating {
         return new BigDecimal(quote.optString("05. price", "0"));
     }
 
-    private String sendOpenAIRequest(JSONObject requestBody, boolean extractRatingOnly) throws IOException {
+    private String sendOpenAIRequest(JSONObject requestBody) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(OPENAI_API_URL)
@@ -104,26 +89,25 @@ public class OpenAIStockRating {
                 .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
                 .addHeader("Content-Type", "application/json")
                 .build();
-    
+
         Response response = client.newCall(request).execute();
-    
+
         if (!response.isSuccessful()) {
             System.out.println("❌ OpenAI API Error: " + response.code() + " - " + response.message());
             System.out.println("🔍 Response Body: " + (response.body() != null ? response.body().string() : "null"));
             return "Error: Failed to get response from AI.";
         }
-    
+
         JSONObject responseJson = new JSONObject(response.body().string());
-        String content = responseJson.getJSONArray("choices")
-                                     .getJSONObject(0)
-                                     .getJSONObject("message")
-                                     .getString("content");
-    
-        return extractRatingOnly ? extractStockRating(content) : content;
+        return responseJson.getJSONArray("choices")
+                           .getJSONObject(0)
+                           .getJSONObject("message")
+                           .getString("content");
     }
-    
-    private String extractStockRating(String aiResponse) {
-        return aiResponse.replaceAll(".*?(\\b\\d+/\\d+\\b).*", "$1");
+
+    // ✅ Make extractStockRating PUBLIC so the controller can call it
+    public String extractStockRating(String aiResponse) {
+        return aiResponse.replaceAll(".*?(\\b\\d+/10\\b).*", "$1");  // Extracts rating (e.g., 8/10)
     }
 
     private BigDecimal getVolatility() {

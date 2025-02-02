@@ -1,20 +1,17 @@
 package com.wealthPlex.WealthPlex.core.controllers;
 
 import org.springframework.web.bind.annotation.*;
-
 import com.wealthPlex.WealthPlex.ratingSystem.OpenAIStockRating;
-
-import org.apache.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/stocks")
-public class rankingController {
+public class RankingController {  
 
     private final OpenAIStockRating stockRatingService;
 
-    public rankingController(OpenAIStockRating stockRatingService) {
+    public RankingController(OpenAIStockRating stockRatingService) {
         this.stockRatingService = stockRatingService;
     }
 
@@ -22,25 +19,26 @@ public class rankingController {
     public ResponseEntity<String> getStockRating(
         @PathVariable String stockSymbol,
         @RequestParam String username) {
-            try { 
-                String rating = stockRatingService.getStockRating(stockSymbol, username);
-                return ResponseEntity.ok(rating);
-            }
-            catch (IOException e){
-                return ResponseEntity.status(500).body("Error fetching stock rating: " + e.getMessage());
-            }
+        try { 
+            // 🔹 Now, we extract rating from AI response instead of making a second API call
+            String fullResponse = stockRatingService.getStockExplanation(stockSymbol, username);
+            String extractedRating = stockRatingService.extractStockRating(fullResponse);
+
+            return ResponseEntity.ok("Stock Rating: " + extractedRating);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error fetching stock rating: " + e.getMessage());
         }
+    }
 
     @GetMapping("/explanation/{stockSymbol}")
     public ResponseEntity<String> getStockExplanation(
         @PathVariable String stockSymbol,
-        @RequestParam String username) throws IOException {
-
-            try {
-                String explanation = stockRatingService.getStockExplanation(stockSymbol, username);
-                return ResponseEntity.ok(explanation);
-            } catch (IOException e) {
-                return ResponseEntity.status(500).body("Error fetching stock explanation: " + e.getMessage());
-            }
+        @RequestParam String username) {
+        try {
+            String explanation = stockRatingService.getStockExplanation(stockSymbol, username);
+            return ResponseEntity.ok(explanation);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error fetching stock explanation: " + e.getMessage());
         }
     }
+}

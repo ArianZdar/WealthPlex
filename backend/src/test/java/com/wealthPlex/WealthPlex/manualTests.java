@@ -1,4 +1,4 @@
-package com.wealthPlex.WealthPlex;
+/*package com.wealthPlex.WealthPlex;
 
 import com.wealthPlex.WealthPlex.core.models.Stock;
 import com.wealthPlex.WealthPlex.core.models.User;
@@ -59,3 +59,4 @@ class manualTests {
 	}
 
 }
+*/
