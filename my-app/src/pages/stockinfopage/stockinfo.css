@@ -1,0 +1,58 @@
+.stock-details-container {
+    width: 96vw;
+    height: 40vw;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+  
+  .stock-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #27ae60; /* Green for positive price */
+  }
+  
+  .stock-description {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 20px 0;
+  }
+  
+  .stock-rating {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #f39c12; /* Gold for ratings */
+  }
+  
+  .stock-graph {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  .back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: #85A947;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background: #3E7B27;
+  }
+  a{
+    color: white;
+  }
+  

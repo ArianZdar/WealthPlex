@@ -16,7 +16,7 @@ function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registration" element={<Register />} />
-        <Route path="/stockinfo" element={<StockInfo />} />
+        <Route path="/stockinfo/:symbol" element={<StockInfo />} />
       </Routes>
     </Router>
   );

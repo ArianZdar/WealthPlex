@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
 
+
 function Portfolio() {
   const navigate = useNavigate();
   const [stocks, setStocks] = useState([]); // Holds stock & ETF data
@@ -9,13 +10,16 @@ function Portfolio() {
   const [error, setError] = useState(null); // Tracks errors
   const [newStockSymbol, setNewStockSymbol] = useState(""); // User input for stock/ETF symbol
 
-  const apiKey = "W8C3AGK5FBFV2BG3"; // Replace with your Alpha Vantage API key
+  // const apiKey = "9OT3J033U7E547OP"; // Replace with your Alpha Vantage API key
+  const apiKey = "W8C3AGK5FBFV2BG3"; 
 
   // Function to fetch a stock/ETF by symbol
   const fetchStockBySymbol = async (symbol) => {
     try {
       setLoading(true);
       setError(null);
+
+
 
       // Step 1: Use SYMBOL_SEARCH to find the correct asset (useful for ETFs like VFV)
       const searchResponse = await fetch(
