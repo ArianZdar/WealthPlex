@@ -54,7 +54,7 @@ public class OpenAIStockRating {
                 "You are a financial analyst. Given the stock name and the type of investor you are advising for (short term or long term), provide a **detailed** analysis in 1-2 paragraphs. You must also look on the internet for the company's financial performance, market trends, and growth prospects and conclude with a rating out of 10 on if this is good for the selected type of investor." +
                 "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
                 "Mention recent news that may impact the stock price, whether positively or negatively. " +
-                "You Must give a rating out of 10, and you must provide an in depth analysis"),
+                "You Must give a rating out of 10 **in the format of X/10, and you must provide an in depth analysis"),
             new JSONObject().put("role", "user").put("content",
                 "Stock: " + stockSymbol + ", Price: $" + price +
                 ", Volatility: " + volatility + ", User: " + username)
