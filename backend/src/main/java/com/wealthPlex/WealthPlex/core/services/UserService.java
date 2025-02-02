@@ -3,6 +3,7 @@ package com.wealthPlex.WealthPlex.core.services;
 
 import com.wealthPlex.WealthPlex.core.models.Stock;
 import com.wealthPlex.WealthPlex.core.models.User;
+import com.wealthPlex.WealthPlex.core.models.WatchedStock;
 import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,12 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private StockPriceService stockPriceService;
 
     public Map<String, Object> getUserByUsername(String username) throws FileNotFoundException {
         boolean doesNotExist = userRepository.idAvailable(username,userRepository.collectionName);
@@ -54,6 +59,80 @@ public class UserService {
         userRepository.saveDocumentWithId(username,user);
         return userRepository.getAsMap(user);
     }
+
+
+    public double getPortfolioValue(String username) {
+        User user = (User) userRepository.getDocumentById(username);
+
+        return user.getStocks().stream().
+                mapToDouble(stock -> {
+                    double stockPrice = user.getWatchlist().stream().filter(watchedStock -> watchedStock.getSymbol().equals(stock.getSymbol())).findFirst().get().getCurrentPrice();
+                    return stockPrice*stock.getAmount();
+                }).
+                sum();
+    }
+
+    public double getAmountPaid(String username) {
+        User user = (User) userRepository.getDocumentById(username);
+        return user.getStocks().stream().
+                mapToDouble(stock -> stock.getAmount()*stock.getAmount()).
+                sum();
+
+    }
+
+    public List<Map<String,Object>> addStockToWatchlist(String username, String symbol) {
+        User user = (User) userRepository.getDocumentById(username);
+        if (user.getWatchlist().contains(symbol)) {
+            throw new IllegalArgumentException("username : " + username +" is already watched!");
+        }
+        WatchedStock watchedStock =  new WatchedStock();
+        watchedStock.setSymbol(symbol);
+        user.getWatchlist().add(watchedStock);
+        userRepository.saveDocumentWithId(username,user);
+        return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
+    }
+
+    public List<Map<String,Object>> refreshWatchlistValues(String username) {
+        User user = (User) userRepository.getDocumentById(username);
+        List<WatchedStock> watchlist = user.getWatchlist().stream().map(stock -> {
+                    String symbol = stock.getSymbol();
+                    Double price = stockPriceService.getStockPrice(symbol);
+                    WatchedStock watchedStock = new WatchedStock();
+                    watchedStock.setSymbol(symbol);
+                    watchedStock.setCurrentPrice(price);
+                    return watchedStock;
+                })
+                .toList();
+        user.setWatchlist(watchlist);
+        userRepository.saveDocumentWithId(username,user);
+        return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
+    }
+
+    public List<Map<String,Object>> getUserWatchlist(String username) {
+        User user = (User) userRepository.getDocumentById(username);
+        return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
+    }
+
+    public List<Map<String,Object>> removeStockFromUser(String username, String stockSymbol) {
+        User user = (User) userRepository.getDocumentById(username);
+        Stock stockToRemove = getStockFromUser(username,stockSymbol);
+        List<Stock> stocks = user.getStocks().stream().toList();
+        stocks.remove(stockToRemove);
+        user.setStocks(stocks);
+        userRepository.saveDocumentWithId(username,user);
+        return user.getStocks().stream().map(stock -> userRepository.getStockAsMap(stock)).toList();
+    }
+
+    public  List<Map<String,Object>> removeStockFromWatchlist(String username, String stockSymbol) {
+        User user = (User) userRepository.getDocumentById(username);
+        WatchedStock stockToRemove =  user.getWatchlist().stream().filter(stock -> stock.getSymbol().equals(stockSymbol)).findFirst().orElse(null);
+        List<WatchedStock> watchlist = user.getWatchlist().stream().toList();
+        watchlist.remove(stockToRemove);
+        user.setWatchlist(watchlist);
+        userRepository.saveDocumentWithId(username,user);
+        return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
+    }
+
 
     public Map<String, Object> login(String username, String password) {
         boolean doesNotExist = userRepository.idAvailable(username,userRepository.collectionName);
