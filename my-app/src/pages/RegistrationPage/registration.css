@@ -1,7 +1,7 @@
 .registration-page { 
     background-image: 
-        linear-gradient(to bottom, rgba(122, 18, 108, 0.8), rgba(69, 2, 92, 0.95)), 
-        url('../../assets/background.png');
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(2, 65, 23, 0.95)), 
+        url('../../assets/newbackground.webp');
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
@@ -20,7 +20,7 @@
 
 .registration-wrapper { 
     width: 420px; 
-    background: rgba(17, 17, 17, 0.6); 
+    background: rgba(3, 31, 9, 0.6); 
     border: 2px solid rgba(0, 0, 0, 0.2); 
     backdrop-filter: blur(20px); 
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); 
@@ -33,7 +33,7 @@
 .registration-wrapper h1 { 
     font-size: 36px; 
     margin-bottom: 30px; 
-    color: #EFB7FF;
+    color: #ffffff;
 }
 
 .registration-wrapper .registration-input-box { 
@@ -58,7 +58,7 @@
 }
 
 .registration-input-box input:focus { 
-    border-color: #db71d2; 
+    border-color: #045d23; 
     box-shadow: 0 0 8px rgba(219, 113, 210, 0.5); 
 }
 
@@ -101,14 +101,14 @@
   .registration-wrapper button {
     width: 100%;
     height: 50px;
-    background: linear-gradient(135deg, #8a0d7d, #d550fa);
+    background: linear-gradient(95deg, #163b2c, #024117);
     border: none;
     outline: none;
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     font-family: 'Monomaniac One';
-    font-size: 16px;
+    font-size: 22px;
     font-weight: bold;
     color: #fff;
     margin-bottom: 20px;
@@ -155,7 +155,7 @@
   }
   
   .login-link p a {
-    color: #EFB7FF;
+    color: #ffffff;
     text-decoration: none;
     font-weight: 600;
   }

@@ -1,34 +1,39 @@
 import React from "react";
 import './registration.css'; 
-import { FaRegUserCircle } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import background from '../../assets/background.png';
+import { FaRegUserCircle, FaLock } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 
-const Registration = ()=>{
+const Registration = () => {
+    const navigate = useNavigate(); 
+
+    const handleRegister = (e) => {
+        e.preventDefault(); 
+        navigate("/portfolio"); 
+    };
+
     return (
         <div className="registration-page">
-            <div className='registration-wrapper'> 
-                <form action="">
+            <div className="registration-wrapper"> 
+                <form onSubmit={handleRegister}>
                     <h1>Register for WealthPlex</h1>
                     <div className="registration-input-box">
-                        <input type="text" placeholder='Username/Email Address' required />
-                        <FaRegUserCircle className='icon'/>
+                        <input type="text" placeholder="Username/Email Address" required />
+                        <FaRegUserCircle className="icon" />
                     </div>
                     <div className="registration-input-box">
-                        <input type="password" placeholder='Password' required />
-                        <FaLock className='icon'/>
+                        <input type="password" placeholder="Password" required />
+                        <FaLock className="icon" />
                     </div>
                     <div className="registration-input-box">
-                        <input type="password" placeholder='Confirm Password' required />
-                        <FaLock className='icon'/>
+                        <input type="password" placeholder="Confirm Password" required />
+                        <FaLock className="icon" />
                     </div>
-                    <button type="submit" className="registration-button"> Register</button>
+                    <button type="submit" className="registration-button">Register</button>
                     
                     <div className="login-link">
-                        <p> Already have an account? <Link to="/login">Login</Link></p>
+                        <p>Already have an account? <Link to="/login">Login</Link></p>
                     </div>
                 </form>
             </div>
