@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public class StockPriceService {
 
-    String alphaVantageAPIkey = "ZXN7K1BW6WF9CCKM";
+    String alphaVantageAPIkey = System.getenv("alphaVantageAPIkey");
 
 
     public JSONObject getStockInformation(String symbol) {
@@ -40,11 +40,23 @@ public class StockPriceService {
         return data;
     }
 
-    public double getStockPrice(String symbol) {
+
+    public Map<String, Object> getStockInfo(String symbol) {
         JSONObject data = getStockInformation(symbol);
         Map<String, Object> quoteMap = data.toMap();
         quoteMap = (Map<String, Object>) quoteMap.get("Global Quote");
         double price = Double.parseDouble(quoteMap.get("05. price").toString());
-        return price;
+        String change = (quoteMap.get("09. change").toString());
+        String changePercent = (quoteMap.get("10. change percent").toString());
+        Map<String, Object> stockInfo = new HashMap<>();
+        stockInfo.put("price", price);
+        stockInfo.put("change", change);
+        stockInfo.put("changePercent", changePercent);
+        return stockInfo;
     }
+
+
+
+
+
 }

@@ -54,7 +54,7 @@ class manualTests {
 
 		User FetchedUser = (User) userRepository.getDocumentById("admin");
 		System.out.println(userRepository.getAsMap(FetchedUser));
-		stockPriceService.getStockPrice("NVDA");
+		//stockPriceService.getStockPrice("NVDA");
 
 	}
 

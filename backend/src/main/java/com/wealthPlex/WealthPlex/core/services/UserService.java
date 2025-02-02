@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,6 +56,10 @@ public class UserService {
         user.setUsername(username);
         user.setPassword(password);
         user.setId(username);
+        user.setProfit(0D);
+        user.setWatchlist(new ArrayList<>());
+        user.setStocks(new ArrayList<>());
+        user.setLongTermInvestor(false);
 
         userRepository.saveDocumentWithId(username,user);
         return userRepository.getAsMap(user);
@@ -87,7 +92,15 @@ public class UserService {
         }
         WatchedStock watchedStock =  new WatchedStock();
         watchedStock.setSymbol(symbol);
-        user.getWatchlist().add(watchedStock);
+        Map<String,Object> info = stockPriceService.getStockInfo(symbol);
+        watchedStock.setChange(Double.parseDouble(info.get("change").toString()));
+        watchedStock.setCurrentPrice(Double.parseDouble(info.get("price").toString()));
+        watchedStock.setChangePercent(info.get("changePercent").toString());
+
+        List<WatchedStock> watchedStocks = new ArrayList<>();
+        user.getWatchlist().stream().forEach(watchedStocks::add);
+        watchedStocks.add(watchedStock);
+        user.setWatchlist(watchedStocks);
         userRepository.saveDocumentWithId(username,user);
         return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
     }
@@ -96,10 +109,12 @@ public class UserService {
         User user = (User) userRepository.getDocumentById(username);
         List<WatchedStock> watchlist = user.getWatchlist().stream().map(stock -> {
                     String symbol = stock.getSymbol();
-                    Double price = stockPriceService.getStockPrice(symbol);
+                    Map<String, Object> info = stockPriceService.getStockInfo(symbol);
                     WatchedStock watchedStock = new WatchedStock();
                     watchedStock.setSymbol(symbol);
-                    watchedStock.setCurrentPrice(price);
+                    watchedStock.setChange(Double.parseDouble(info.get("change").toString()));
+                    watchedStock.setCurrentPrice(Double.parseDouble(info.get("price").toString()));
+                    watchedStock.setChangePercent(info.get("changePercent").toString());
                     return watchedStock;
                 })
                 .toList();
@@ -126,9 +141,10 @@ public class UserService {
     public  List<Map<String,Object>> removeStockFromWatchlist(String username, String stockSymbol) {
         User user = (User) userRepository.getDocumentById(username);
         WatchedStock stockToRemove =  user.getWatchlist().stream().filter(stock -> stock.getSymbol().equals(stockSymbol)).findFirst().orElse(null);
-        List<WatchedStock> watchlist = user.getWatchlist().stream().toList();
-        watchlist.remove(stockToRemove);
-        user.setWatchlist(watchlist);
+        List<WatchedStock> watchedStocks = new ArrayList<>();
+        user.getWatchlist().stream().forEach(watchedStocks::add);
+        watchedStocks.remove(stockToRemove);
+        user.setWatchlist(watchedStocks);
         userRepository.saveDocumentWithId(username,user);
         return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
     }
@@ -167,7 +183,8 @@ public class UserService {
 
     public Map<String, Object> buyStock(String username, String symbol, double price, int amount) throws FileNotFoundException {
         User user = (User) userRepository.getFromMap(getUserByUsername(username));
-        List<Stock> stocks = user.getStocks();
+        List<Stock> stocks = new ArrayList<>();
+        user.getStocks().forEach(stock -> {stocks.add(stock);});
         boolean hasStock = stocks.stream().anyMatch(stock -> stock.getSymbol().equals(symbol));
         if (!hasStock) {
             Stock stock = new Stock();
@@ -183,19 +200,21 @@ public class UserService {
             stock.setPrice(totalPrice/totalAmount);
             stock.setAmount(totalAmount);
         }
+        user.setStocks(stocks);
         userRepository.saveDocumentWithId(username,user);
         return userRepository.getAsMap(user);
     }
 
-    public double sellStock(String username, String symbol, double price, int amount) throws IllegalArgumentException {
+    public double sellStock(String username, String symbol, int amount) throws IllegalArgumentException {
         User user = (User) userRepository.getDocumentById(username);
         Stock stock = getStockFromUser(username, symbol);
+        Double stockPrice = stockPriceService.getStockInformation(symbol).getDouble("price");
         double profit;
         if (stock.getAmount() < amount) {
             throw new IllegalArgumentException("Not enough stocks!");
         } else {
             stock.setAmount(stock.getAmount() - amount);
-            profit = stock.getPrice() * price;
+            profit = stock.getPrice() * stockPrice;
         }
         user.setProfit(user.getProfit() + profit);
         userRepository.saveDocumentWithId(username,user);

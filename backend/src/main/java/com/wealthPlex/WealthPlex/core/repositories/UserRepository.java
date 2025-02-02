@@ -79,6 +79,8 @@ public class UserRepository extends DocumentRepository {
         Map<String, Object> stockMap = new HashMap<String, Object>();
         stockMap.put("symbol",watchedStock.getSymbol());
         stockMap.put("currentPrice",watchedStock.getCurrentPrice());
+        stockMap.put("change",watchedStock.getChange());
+        stockMap.put("changePercent",watchedStock.getChangePercent());
         return stockMap;
     }
 
@@ -94,6 +96,8 @@ public class UserRepository extends DocumentRepository {
         WatchedStock watchedStock = new WatchedStock();
         watchedStock.setSymbol((String) map.get("symbol"));
         watchedStock.setCurrentPrice(Double.parseDouble(map.get("currentPrice").toString()));
+        watchedStock.setChange(Double.parseDouble(map.get("change").toString()));
+        watchedStock.setChangePercent((map.get("changePercent").toString()));
         return watchedStock;
     }
 

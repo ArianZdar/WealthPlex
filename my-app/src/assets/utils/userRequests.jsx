@@ -56,6 +56,118 @@ async function getPortfolioValue(username) {
 
 }
 
+async function addStockToWatchlist(username, symbol) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/watchlist/"+symbol, {
+            method: "POST"
+        });
+
+        if (!response.ok) throw new Error("Failed to add stock to list");
+
+        const result = await response.json();
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+}
+
+
+async function removeStockFromWatchlist(username, symbol) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/watchlist/"+symbol, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) throw new Error("Failed to add stock to list");
+
+        const result = await response.json();
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+}
+
+async function getUserWatchlist(username) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/watchlist", {
+            method: "GET"
+        });
+
+        if (!response.ok) throw new Error("Failed to add stock to list");
+
+        const result = await response.json();
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+}
+
+async function buyStock(username, amount, symbol, price) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/stocks/"+symbol, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount, price }),
+        });
+
+        if (!response.ok) throw new Error("Failed to buy stocks");
+
+        const result = await response.json();
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+}
+
+async function sellStock(username, amount, symbol) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/stocks/"+symbol+"/sell/"+amount, {
+            method: "POST",
+           
+        });
+
+        if (!response.ok) throw new Error("Failed to sell stock ");
+
+        const result = await response.json();
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+}
+
+async function getStocks(username) {
+    try {
+        const response = await fetch(root + "/users/"+ username + "/stocks", {
+            method: "GET"
+        });
+
+        if (!response.ok) throw new Error("Failed to add stock to list");
+
+        const result = await response.json();
+        console.log("Signup Response:", result);
+        return result;
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        throw error; // Rethrow error to handle it in UI
+    }
+}
+
+
+
+
+
+
+
 // Export both functions
-export { signup, login ,getPortfolioValue};
+export { signup, login ,getPortfolioValue,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks};
 
