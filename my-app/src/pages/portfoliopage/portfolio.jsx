@@ -72,10 +72,9 @@ function Portfolio() {
     }
 
     try {
-
       const updatedPortfolio = await getStocks(username);
       console.log(updatedPortfolio);
-      setStocks(updatedPortfolio); // Update watchlist with the new list
+      setStocklist(updatedPortfolio); // Update watchlist with the new list
     } catch (error) {
       setError("Failed to add stock to watchlist: " + error.message);
     }
