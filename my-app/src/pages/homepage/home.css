@@ -44,8 +44,8 @@ body {
 
 /* Container - Centered layout */
 .container {
-    max-width: 900px;
-    height: 40rem;
+    width: 50vw;
+    height: 38vw;
     text-align: center;
     padding: 3rem;
     background: #F2EFE5;

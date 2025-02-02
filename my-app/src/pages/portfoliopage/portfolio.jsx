@@ -36,8 +36,8 @@ function Portfolio() {
         `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${bestMatch}&apikey=${apiKey}`
       );
 
-      const data = await response.json();
-      const stockData = data["Global Quote"];
+      const quoteData = await quoteResponse.json();
+      const stockData = quoteData["Global Quote"];
 
       if (!stockData || !stockData["05. price"]) {
         throw new Error(`Could not retrieve data for "${bestMatch}".`);
@@ -66,10 +66,6 @@ function Portfolio() {
     e.preventDefault();
     if (!newStockSymbol.trim()) {
       setError("Please enter a valid stock or ETF symbol.");
-      return;
-    }
-    if (!/^[A-Z]+$/.test(newStockSymbol.trim().toUpperCase())) {
-      setError("Stock symbols must contain only letters.");
       return;
     }
     fetchStockBySymbol(newStockSymbol.toUpperCase());
