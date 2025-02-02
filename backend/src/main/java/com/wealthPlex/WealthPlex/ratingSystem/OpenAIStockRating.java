@@ -7,7 +7,6 @@ import yahoofinance.histquotes.Interval;
 import okhttp3.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.wealthPlex.WealthPlex.core.models.User;
 import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
@@ -20,16 +19,15 @@ import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.List;
 
-@Service
 public class OpenAIStockRating {
 
     private static final String OPENAI_API_KEY = ""; // Replace with actual API key
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-    
-    @Autowired
+
+//    @Autowired
     UserService userService;
 
-    @Autowired
+//    @Autowired
     UserRepository userRepository;
 
     public String getStockRating(String stockSymbol, String username) throws IOException {
@@ -49,17 +47,17 @@ public class OpenAIStockRating {
 
         // Create OpenAI API request body
         JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "gpt-3.5-turbo"); 
+        requestBody.put("model", "gpt-3.5-turbo");
         requestBody.put("messages", new Object[]{
-            new JSONObject().put("role", "system").put("content", 
+            new JSONObject().put("role", "system").put("content",
                 "You are an AI that rates stocks based on the selected investment strategy. "
                 + "Short-term ratings prioritize volatility and recent price movements. A short-term investor likes volatile stocks. "
                 + "Long-term ratings prioritize stability and historical performance."),
-            
+
             new JSONObject().put("role", "user").put("content",
-                "Stock: " + stockSymbol + 
+                "Stock: " + stockSymbol +
                 ", Price: $" + price +
-                ", Volatility: " + volatility +  
+                ", Volatility: " + volatility +
                 ", Investment Type: " + investorType)
         });
 
@@ -100,7 +98,7 @@ public class OpenAIStockRating {
         // Compute Volatility
         return BigDecimal.valueOf(computeStandardDeviation(history));
     }
-    
+
     private static double computeStandardDeviation(List<HistoricalQuote> history) {
         double sumReturns = 0.0;
         double sumSquaredReturns = 0.0;
@@ -133,12 +131,12 @@ public class OpenAIStockRating {
     private double getNetGain(String stockSymbol, String username) throws FileNotFoundException{
         double netGain=0;
         User user = (User) userRepository.getFromMap(userService.getUserByUsername(username));
-        
+        // then do net percent gain
 
         return netGain;
     }
 
     public static void main(String[] args) throws IOException {
-        
+
     }
 }

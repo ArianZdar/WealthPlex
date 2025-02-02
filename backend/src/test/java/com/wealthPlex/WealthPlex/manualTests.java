@@ -4,7 +4,6 @@ import com.wealthPlex.WealthPlex.core.models.Stock;
 import com.wealthPlex.WealthPlex.core.models.User;
 import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
 import com.wealthPlex.WealthPlex.core.services.UserService;
-import com.wealthPlex.WealthPlex.firestore.model.FirestoreImplementation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,13 +12,12 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 @SpringBootTest
-class WealthPlexApplicationTests {
-
-	@Autowired
-	UserRepository userRepository;
+class manualTests {
 
 	@Autowired
 	UserService userService;
+	@Autowired
+	UserRepository userRepository;
 
 	@Test
 	void manualTests() {
