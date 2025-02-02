@@ -6,16 +6,12 @@ import com.wealthPlex.WealthPlex.core.models.User;
 import com.wealthPlex.WealthPlex.core.models.WatchedStock;
 import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserService {
@@ -193,12 +189,15 @@ public class UserService {
             stock.setAmount(amount);
             stocks.add(stock);
         } else {
-            Stock stock = getStockFromUser(username, symbol);
-            double totalPrice = stock.getPrice() * stock.getAmount();
+            Stock addedStock = stocks.stream().filter(stock -> stock.getSymbol().equals(symbol)).findFirst().get();
+            double totalPrice = addedStock.getPrice() * addedStock.getAmount();
             totalPrice += price*amount;
-            int totalAmount = stock.getAmount() + amount;
-            stock.setPrice(totalPrice/totalAmount);
-            stock.setAmount(totalAmount);
+            int totalAmount = addedStock.getAmount() + amount;
+            double averagePrice = totalPrice / totalAmount;
+            averagePrice = Math.round(averagePrice * Math.pow(10, 4))
+                    / Math.pow(10, 4);
+            addedStock.setPrice(Math.round(totalPrice/totalAmount));
+            addedStock.setAmount(totalAmount);
         }
         user.setStocks(stocks);
         userRepository.saveDocumentWithId(username,user);

@@ -40,7 +40,9 @@ function Portfolio() {
     const roundedPrice = Math.round(parseFloat(price)) || 0; 
     try {
       // Call addStockToWatchlist and wait for the response
-      const updatedPortfolio = await buyStock(username,quantity,symbol,roundedPrice);
+      const updatedUser = await buyStock(username,quantity,symbol,roundedPrice);
+      const updatedPortfolio = updatedUser["stocks"];
+      console.log(updatedPortfolio);
       setStocklist(updatedPortfolio); // Update watchlist with the new list
     } catch (error) {
       setError("Failed to add stock to watchlist: " + error.message);
@@ -244,7 +246,7 @@ function Portfolio() {
                     className="input-field"
                     placeholder="Enter price"
                   />
-                  <button className="sell-button" onClick={() => handleSellStock(stock.symbol, stock.quantity)}>Sell</button>
+                  <button className="sell-button" onClick={() => handleSellStock(stock.symbol, stock.amount)}>Sell</button>
                 </div>
               </td>
               <td>
