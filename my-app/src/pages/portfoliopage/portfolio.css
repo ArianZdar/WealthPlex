@@ -1,91 +1,164 @@
-/* General Styling */
-
-
-/* Portfolio Container */
 .portfolio-container {
-    width: 95vw; /* Increase width */
-    height: 47vw; /* Make it take up most of the screen */
-    margin: auto;
-    padding: 40px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Distribute content evenly */
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(2, 65, 23, 0.95)),
+        url('../../assets/newbackground.webp');
+        background-size: cover; 
+        background-position: center; 
+        background-repeat: no-repeat;
+        min-height: 100vh; 
+        width: 100%; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
 }
 
-/* Portfolio Balance */
 .balance-section {
-    margin-bottom: 20px;
-    padding: 20px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #5D8736, #5D8736); /* Wealthsimple blue gradient */
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 87, 255, 0.2);
+    background: rgba(3, 31, 9, 0.8);
+    border-radius: 10px;
+    padding: 20px 30px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 600px;
+
+    /* Positioning properties */
+    position: absolute; /* Allows you to control the exact position */
+    top: 8%; /* Adjust vertical position */
+    left: 20%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Centers the element */
 }
 
 .balance-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    color: #e5ffe5;
+    margin-bottom: 5px;
 }
 
 .balance-amount {
-    font-size: 2.5rem;
+    font-size: 36px;
     font-weight: bold;
+    color: #ffffff;
 }
 
-/* Stock Table */
+.add-stock-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px; 
+    position: absolute;
+    top: 20; 
+    left: 70%; 
+    transform: translate(-50%, -50%);
+
+    /* Dynamic size control */
+    height: auto; /* Let content determine height, but you can set a value */
+    padding: 20px; /* Optional: Add padding */
+}
+
+
+.add-stock-form {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.add-stock-form input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-stock-form input:focus {
+    border-color: #045d23;
+    box-shadow: 0 0 6px rgba(4, 93, 35, 0.5);
+}
+
+.add-stock-form .add-stock-button {
+    height: 40px;
+    background: linear-gradient(95deg, #163b2c, #024117);
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 0 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-stock-form .add-stock-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.error-message {
+    color: #ff4c4c;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
 .stock-table {
     width: 100%;
+    max-width: 800px;
+    margin: 0 auto 30px;
     border-collapse: collapse;
-    margin-top: 20px;
+    background: rgba(3, 31, 9, 0.8);
+    color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-.stock-table th, .stock-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+.stock-table thead {
+    background: #024117;
+    color: #e5ffe5;
 }
 
-.stock-table th {
-    background: #f7f7f7;
-    font-weight: 600;
+.stock-table th,
+.stock-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.stock-name {
-    font-weight: bold;
+.stock-table .stock-change.positive {
+    color: #32cd32;
 }
 
-.stock-price {
-    color: #0057FF;
+.stock-table .stock-change.negative {
+    color: #ff4c4c;
 }
 
-.stock-change.positive {
-    color: #27AE60; /* Green for gains */
-}
-
-.stock-change.negative {
-    color: #E74C3C; /* Red for losses */
-}
-
-/* Back Button */
 .back-button {
-    display: inline-block;
     margin-top: 20px;
     padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: white;
-    background: #85A947;
+    background: linear-gradient(95deg, #163b2c, #024117);
     border: none;
-    border-radius: 8px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .back-button:hover {
-    background: #3E7B27;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
