@@ -205,6 +205,15 @@ public class UserService {
         return userRepository.getAsMap(user);
     }
 
+    public double getProfitOnStock(String username, String stockSymbol) {
+        User user = (User) userRepository.getDocumentById(username);
+        List<Stock> stocks = user.getStocks();
+        Double stockPrice = stockPriceService.getStockInformation(stockSymbol).getDouble("price");
+        Stock ownedStock = stocks.stream().filter(stock -> stock.getSymbol().equals(stockSymbol)).findFirst().get();
+        return (ownedStock.getAmount()*(stockPrice-ownedStock.getPrice()));
+
+    }
+
     public double sellStock(String username, String symbol, int amount) throws IllegalArgumentException {
         User user = (User) userRepository.getDocumentById(username);
         Stock stock = getStockFromUser(username, symbol);

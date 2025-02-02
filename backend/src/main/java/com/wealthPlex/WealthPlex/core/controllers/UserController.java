@@ -71,6 +71,12 @@ public class UserController {
         return userService.getUserProfit(userId);
     }
 
+    @GetMapping("/users/{userId}/stocks/{stock}/profit")
+    @ResponseStatus(HttpStatus.OK)
+    public double getStockProfit(@PathVariable String userId, @PathVariable String stock) {
+        return userService.getProfitOnStock(userId,stock);
+    }
+
     @DeleteMapping("/users/{userId}/watchlist/{symbol}")
     @ResponseStatus(HttpStatus.OK)
     public  List<Map<String,Object>> removeStockFromWatchlist(@PathVariable String userId, @PathVariable String symbol) {
