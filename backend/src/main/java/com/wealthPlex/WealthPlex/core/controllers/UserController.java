@@ -1,4 +1,6 @@
 package com.wealthPlex.WealthPlex.core.controllers;
+import com.wealthPlex.WealthPlex.core.DTOs.LoginRequest;
+import com.wealthPlex.WealthPlex.core.DTOs.SignupRequest;
 import com.wealthPlex.WealthPlex.core.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,15 +26,18 @@ public class UserController {
     public List<Map<String,Object>> getStocksForUser(@PathVariable String userId) throws FileNotFoundException {
         return userService.getUserStocks(userId);
     }
+
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/users/login")
-    public Map<String,Object> getLoginUser(@RequestBody String username, @RequestBody String password ) {
-        return userService.login(username, password);
+    @PostMapping("/users/login")
+    public boolean getLoginUser(@RequestBody LoginRequest loginRequest ) {
+        userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        return true;
     }
+
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/users")
-    public void signUp(@RequestBody String username, @RequestBody String password) {
-        userService.signUp(username, password);
+    public void signUp(@RequestBody SignupRequest signupRequest) {
+        userService.signUp(signupRequest.getUsername(), signupRequest.getPassword());
     }
 
     @PostMapping("/users/{userId}/investmentType/{longTerm}")
@@ -66,36 +71,43 @@ public class UserController {
     }
 
     @DeleteMapping("users/{userId}/watchlist/{symbol}")
+    @ResponseStatus(HttpStatus.OK)
     public  List<Map<String,Object>> removeStockFromWatchlist(@PathVariable String userId, @PathVariable String symbol) {
         return userService.removeStockFromWatchlist(userId,symbol);
     }
 
     @DeleteMapping("users/{userId}/stocks/{symbol}")
+    @ResponseStatus(HttpStatus.OK)
     public List<Map<String,Object>> removeStockFromUser(@PathVariable String userId, @PathVariable String symbol) {
         return userService.removeStockFromUser(userId,symbol);
     }
 
     @GetMapping("users/{userId}/watchlist")
+    @ResponseStatus(HttpStatus.OK)
     public List<Map<String,Object>> getUserWatchlist(@PathVariable String userId) {
         return userService.getUserWatchlist(userId);
     }
 
     @GetMapping("users/{userId}/watchlistR")
+    @ResponseStatus(HttpStatus.OK)
     public List<Map<String,Object>> refreshUserWatchlist(@PathVariable String userId) {
         return userService.refreshWatchlistValues(userId);
     }
 
     @PostMapping("users/{userId}/stocks/{symbol}")
+    @ResponseStatus(HttpStatus.OK)
     public List<Map<String,Object>> addStockToWatchlist(@PathVariable String userId, @PathVariable String symbol) {
         return userService.addStockToWatchlist(userId,symbol);
     }
 
     @GetMapping("users/{userId}/portfolio/price")
+    @ResponseStatus(HttpStatus.OK)
     public double getPortfolioPrice(@PathVariable String userId) {
         return userService.getAmountPaid(userId);
     }
 
     @GetMapping("users/{userId}/portfolio/value")
+    @ResponseStatus(HttpStatus.OK)
     public double getPortfolioValue(@PathVariable String userId) {
         return userService.getPortfolioValue(userId);
     }
