@@ -39,7 +39,7 @@ public class UserService {
             throw new FileNotFoundException("User " + username +" does not exist!");
         }
         User user = (User) userRepository.getDocumentById(username);
-        return user.getStocks().stream().map(stock -> userRepository.getStockAsMap(stock)).toList();
+        return user.getStocks().stream().filter(stock -> stock.getAmount()!=0).map(stock -> userRepository.getStockAsMap(stock)).toList();
     }
 
     public Map<String, Object> signUp(String username, String password) {
@@ -83,8 +83,8 @@ public class UserService {
 
     public List<Map<String,Object>> addStockToWatchlist(String username, String symbol) {
         User user = (User) userRepository.getDocumentById(username);
-        if (user.getWatchlist().contains(symbol)) {
-            throw new IllegalArgumentException("username : " + username +" is already watched!");
+        if (user.getWatchlist().stream().map(WatchedStock::getSymbol).toList().contains(symbol)) {
+            return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
         }
         WatchedStock watchedStock =  new WatchedStock();
         watchedStock.setSymbol(symbol);
@@ -205,7 +205,7 @@ public class UserService {
     public double getProfitOnStock(String username, String stockSymbol) {
         User user = (User) userRepository.getDocumentById(username);
         List<Stock> stocks = user.getStocks();
-        Double stockPrice = stockPriceService.getStockInformation(stockSymbol).getDouble("price");
+        Double stockPrice = Double.parseDouble(stockPriceService.getStockInfo(stockSymbol).get("price").toString());
         Stock ownedStock = stocks.stream().filter(stock -> stock.getSymbol().equals(stockSymbol)).findFirst().get();
         return (ownedStock.getAmount()*(stockPrice-ownedStock.getPrice()));
 
@@ -214,7 +214,7 @@ public class UserService {
     public double sellStock(String username, String symbol, int amount) throws IllegalArgumentException {
         User user = (User) userRepository.getDocumentById(username);
         Stock stock = getStockFromUser(username, symbol);
-        Double stockPrice = stockPriceService.getStockInformation(symbol).getDouble("price");
+        Double stockPrice = Double.parseDouble(stockPriceService.getStockInfo(symbol).get("price").toString());
         double profit;
         if (stock.getAmount() < amount) {
             throw new IllegalArgumentException("Not enough stocks!");
@@ -223,6 +223,11 @@ public class UserService {
             profit = stock.getPrice() * stockPrice;
         }
         user.setProfit(user.getProfit() + profit);
+        List<Stock> newStocks = new ArrayList<>(user.getStocks().stream().filter(userStock -> (!userStock.getSymbol().equals(symbol))).toList());
+        if (stock.getAmount()!= 0) {
+            newStocks.add(stock);
+        }
+        user.setStocks(newStocks);
         userRepository.saveDocumentWithId(username,user);
         return profit;
     }

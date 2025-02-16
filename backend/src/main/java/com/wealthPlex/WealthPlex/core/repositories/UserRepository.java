@@ -53,9 +53,14 @@ public class UserRepository extends DocumentRepository {
         user.setPassword(map.get("password").toString());
         user.setLongTermInvestor((Boolean) map.get("isLongTermInvestor"));
         List<Map<String,Object>> stocks = (List<Map<String, Object>>) map.get("stocks");
-        user.setStocks(stocks.stream().map(this::getStockFromMap).toList());
+        if (stocks!=null) {
+            user.setStocks(stocks.stream().map(this::getStockFromMap).toList());
+        }
         List<Map<String,Object>> watchlist = (List<Map<String, Object>>) map.get("watchlist");
-        user.setWatchlist(watchlist.stream().map(this::getWatchedStockFromMap).toList());
+        if (watchlist!=null) {
+            user.setWatchlist(watchlist.stream().map(this::getWatchedStockFromMap).toList());
+        }
+
         return user;
     }
 
