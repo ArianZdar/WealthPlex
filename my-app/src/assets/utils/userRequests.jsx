@@ -44,7 +44,7 @@ async function getPortfolioValue(username) {
 
         if (!response.ok) throw new Error("Failed to get protfolio value");
 
-        const result = await response;
+        const result = await response.text();
         console.log("Got profolio value :", result);
         return result;
     } catch (error) {
@@ -52,6 +52,23 @@ async function getPortfolioValue(username) {
     }
 
 }
+
+async function getUserProfit(username) {
+    try {
+        const response = await fetch(root + "/users/"+username+"/profit",);
+
+        if (!response.ok) throw new Error("Failed to get protfolio profit");
+
+        const result = await response.text();
+        console.log("Got profolio value :", result);
+        return result;
+    } catch (error) {
+        console.error("Fetch portfolio value error :", error.message);
+    }
+
+}
+
+
 
 async function addStockToWatchlist(username, symbol) {
     try {
@@ -176,6 +193,6 @@ async function getProfitOnStock(username,Symbol) {
 
 
 
-// Export both functions
-export { signup, login ,getPortfolioValue,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks,getProfitOnStock};
+
+export { signup, login ,getPortfolioValue,getUserProfit,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks,getProfitOnStock};
 

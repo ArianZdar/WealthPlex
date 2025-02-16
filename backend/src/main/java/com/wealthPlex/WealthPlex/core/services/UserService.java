@@ -20,7 +20,7 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private StockPriceService stockPriceService;
+    private StockApiService stockApiService;
 
     public Map<String, Object> getUserByUsername(String username) throws FileNotFoundException {
         boolean doesNotExist = userRepository.idAvailable(username,userRepository.collectionName);
@@ -88,7 +88,8 @@ public class UserService {
         }
         WatchedStock watchedStock =  new WatchedStock();
         watchedStock.setSymbol(symbol);
-        Map<String,Object> info = stockPriceService.getStockInfo(symbol);
+        Map<String,Object> info = stockApiService.getStockInfo(symbol);
+        if (info == null) return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
         watchedStock.setChange(Double.parseDouble(info.get("change").toString()));
         watchedStock.setCurrentPrice(Double.parseDouble(info.get("price").toString()));
         watchedStock.setChangePercent(info.get("changePercent").toString());
@@ -105,7 +106,7 @@ public class UserService {
         User user = (User) userRepository.getDocumentById(username);
         List<WatchedStock> watchlist = user.getWatchlist().stream().map(stock -> {
                     String symbol = stock.getSymbol();
-                    Map<String, Object> info = stockPriceService.getStockInfo(symbol);
+                    Map<String, Object> info = stockApiService.getStockInfo(symbol);
                     WatchedStock watchedStock = new WatchedStock();
                     watchedStock.setSymbol(symbol);
                     watchedStock.setChange(Double.parseDouble(info.get("change").toString()));
@@ -205,7 +206,7 @@ public class UserService {
     public double getProfitOnStock(String username, String stockSymbol) {
         User user = (User) userRepository.getDocumentById(username);
         List<Stock> stocks = user.getStocks();
-        Double stockPrice = Double.parseDouble(stockPriceService.getStockInfo(stockSymbol).get("price").toString());
+        Double stockPrice = Double.parseDouble(stockApiService.getStockInfo(stockSymbol).get("price").toString());
         Stock ownedStock = stocks.stream().filter(stock -> stock.getSymbol().equals(stockSymbol)).findFirst().get();
         return (ownedStock.getAmount()*(stockPrice-ownedStock.getPrice()));
 
@@ -214,7 +215,7 @@ public class UserService {
     public double sellStock(String username, String symbol, int amount) throws IllegalArgumentException {
         User user = (User) userRepository.getDocumentById(username);
         Stock stock = getStockFromUser(username, symbol);
-        Double stockPrice = Double.parseDouble(stockPriceService.getStockInfo(symbol).get("price").toString());
+        Double stockPrice = Double.parseDouble(stockApiService.getStockInfo(symbol).get("price").toString());
         double profit;
         if (stock.getAmount() < amount) {
             throw new IllegalArgumentException("Not enough stocks!");

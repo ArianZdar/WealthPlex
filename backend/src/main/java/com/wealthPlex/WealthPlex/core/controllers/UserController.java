@@ -2,6 +2,7 @@ package com.wealthPlex.WealthPlex.core.controllers;
 import com.wealthPlex.WealthPlex.core.DTOs.LoginRequest;
 import com.wealthPlex.WealthPlex.core.DTOs.SignupRequest;
 import com.wealthPlex.WealthPlex.core.DTOs.StockBuyRequest;
+import com.wealthPlex.WealthPlex.core.services.StockApiService;
 import com.wealthPlex.WealthPlex.core.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private StockApiService stockApiService;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users/{userId}")
@@ -118,6 +121,13 @@ public class UserController {
     public double getPortfolioValue(@PathVariable String userId) {
         return userService.getPortfolioValue(userId);
     }
+
+    @GetMapping("stocks/{symbol}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> getStockMatches(@PathVariable String symbol) {
+        return stockApiService.getMatches(symbol);
+    }
+
 
 
 

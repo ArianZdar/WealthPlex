@@ -6,16 +6,13 @@
     background-repeat: no-repeat;
     min-height: 100vh; 
     width: 100%; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    flex-direction: column;
+    align-items: flex-start; 
+    overflow-x: hidden; 
+    padding-top: 10%;
+    top: 50px;
+    bottom: auto; 
 }
-
 
 .balance-section {
     background: rgba(3, 31, 9, 0.8);
@@ -26,13 +23,7 @@
     margin-bottom: 30px;
     width: 100%;
     max-width: 600px;
-    height:170px;
-
-    
-    position: absolute; 
-    top: 10%; 
-    left: 18%;
-    transform: translate(-50%, -50%); 
+    height: 170px;
 }
 
 .balance-title {
@@ -48,29 +39,9 @@
     color: hsl(0, 0%, 100%);
 }
 
-.add-stock-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;;
-    margin-bottom: 0px;
-    width: 100%;
-    position: absolute;
-    top: 15%; 
-    left: 52%; 
-    transform: translate(-50%, -50%);
-    height: auto; 
-    padding: 20px; 
-}
-
-
 .add-stock-form {
     display: flex;
     width: 50%;
-    position: absolute;
-    top: 12%; 
-    left: 67%; 
-    transform: translate(-50%, -50%);
-    height: 12; 
     padding: 20px; 
     gap: 10px;
 }
@@ -81,8 +52,7 @@
     align-items: center; /* Aligns vertically */
     width: 100%; /* Ensures full width */
     padding: 10px 0; /* Adds spacing */
-  }
-  
+}
 
 .add-stock-form input {
     flex: 1;
@@ -110,7 +80,6 @@
     font-weight: bold;
     font-size: 20px;
     border-radius: 10px;
-    left: 100;
     padding: 20px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -133,8 +102,8 @@
     width: 100%; /* Ensure it spans full width */
     max-width: 100vw; /* Prevents any unwanted shrinking */
     padding: 20px; /* Adds spacing */
+    margin-top: 20px; /* Adds space between add stock section and tables */
 }
-
 
 .stock-table-section, .holding-table-section {
     width: 100%;
@@ -142,7 +111,7 @@
     justify-content: center;
 }
 
- .holding-table {
+.holding-table {
     width: 100%; 
     max-width: 100%; 
     border-collapse: collapse;
@@ -151,18 +120,13 @@
     border-radius: 0px;
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    transform: translate(-50%, -50%); 
-    position: relative; /* Or absolute if needed, adjust z-index */
-    z-index: 10; /* Ensure it's in the correct stacking context */
-  }
-  
+}
 
-  
-  .buy-button, .remove-button {
+.buy-button, .remove-button {
     padding: 8px 12px;
     margin-top: 5px;
     cursor: pointer;
-  }
+}
 
 .stock-table {
     width: 100%; /* Ensure full width */
@@ -174,16 +138,15 @@
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     margin: 0 auto; /* Center the table */
-    transform: translate(-50%, -50%);  /* Remove transformation */
 }
 
-.stock-table thead, holding-table thead {
+.stock-table thead, .holding-table thead {
     background: #024117;
     color: #e5ffe5;
 }
 
-stock-table th, .holding-table th,
-stock-table td, .holding-table td {
+.stock-table th, .holding-table th,
+.stock-table td, .holding-table td {
     padding: 10px;
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -200,8 +163,8 @@ stock-table td, .holding-table td {
 
 .back-button {
     margin-top: 800px;
-    left:150px;
-    height:100px;
+    left: 150px;
+    height: 100px;
     padding: 20px;
     background: linear-gradient(95deg, #163b2c, #024117);
     border: none;
@@ -221,7 +184,6 @@ stock-table td, .holding-table td {
     font-weight: bold;
     font-size: 12px;
     border-radius: 10px;
-    left: 100;
     padding: 20px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     text-align: center;
@@ -237,10 +199,10 @@ stock-table td, .holding-table td {
     display: flex;
     align-items: center; /* Align the items vertically in the center */
     gap: 10px; /* Add space between each element */
-  }
-  
-  .input-field {
+}
+
+.input-field {
     width: 100px; /* Set width of the input fields */
     padding: 5px;
     text-align: center; /* Center the numbers inside the input field */
-  }
+}
