@@ -37,8 +37,8 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/users")
-    public void signUp(@RequestBody SignupRequest signupRequest) {
-        userService.signUp(signupRequest.getUsername(), signupRequest.getPassword());
+    public Map<String, Object> signUp(@RequestBody SignupRequest signupRequest) {
+        return userService.signUp(signupRequest.getUsername(), signupRequest.getPassword());
     }
 
     @PostMapping("/users/{userId}/investmentType/{longTerm}")

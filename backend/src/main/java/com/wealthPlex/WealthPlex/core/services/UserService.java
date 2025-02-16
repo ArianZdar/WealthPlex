@@ -179,8 +179,7 @@ public class UserService {
 
     public Map<String, Object> buyStock(String username, String symbol, double price, int amount) throws FileNotFoundException {
         User user = (User) userRepository.getFromMap(getUserByUsername(username));
-        List<Stock> stocks = new ArrayList<>();
-        user.getStocks().forEach(stock -> {stocks.add(stock);});
+        List<Stock> stocks = new ArrayList<>(user.getStocks());
         boolean hasStock = stocks.stream().anyMatch(stock -> stock.getSymbol().equals(symbol));
         if (!hasStock) {
             Stock stock = new Stock();
@@ -194,9 +193,8 @@ public class UserService {
             totalPrice += price*amount;
             int totalAmount = addedStock.getAmount() + amount;
             double averagePrice = totalPrice / totalAmount;
-            averagePrice = Math.round(averagePrice * Math.pow(10, 4))
-                    / Math.pow(10, 4);
-            addedStock.setPrice(Math.round(totalPrice/totalAmount));
+            averagePrice = Math.round(averagePrice * Math.pow(10, 4)) / Math.pow(10, 4);
+            addedStock.setPrice(Math.round(averagePrice));
             addedStock.setAmount(totalAmount);
         }
         user.setStocks(stocks);
