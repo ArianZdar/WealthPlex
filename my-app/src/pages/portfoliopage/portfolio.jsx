@@ -19,6 +19,7 @@ function Portfolio() {
   const [stockRecommendations, setStockRecommendations] = useState([]);
   const [portfolioValue, setPortfolioValue] = useState(0);
   const [userProfit, setUserProfit] = useState(0);
+  const [openGainLoss, setOpenGainLoss] = useState(0);
 
   const handleAddStock = async (e) => {
     e.preventDefault();
@@ -93,6 +94,10 @@ function Portfolio() {
     const username = localStorage.getItem("loggedInUsername");
     await fetchPortfolioValue();
     await fetchProfit();
+
+    const openGainLoss = stocklist.reduce((acc, stock) => acc + parseFloat(stock.profit), 0);
+    console.log(openGainLoss);
+    setOpenGainLoss(openGainLoss);
 
     try {
       const updatedWatchlist = await getUserWatchlist(username);
@@ -183,7 +188,7 @@ function Portfolio() {
 
                 <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
                 <Typography variant="h4" gutterBottom>Open/Gain Loss</Typography>
-                <Typography variant="h5" gutterBottom>{userProfit}</Typography>
+                <Typography variant="h5" gutterBottom>{openGainLoss}</Typography>
                 </Stack>
 
 

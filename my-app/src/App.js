@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import { AnimatePresence, motion } from "framer-motion";
 import Home from "./pages/homepage/home";
 import Portfolio from "./pages/portfoliopage/portfolio";
@@ -24,6 +26,13 @@ function AnimatedRoutes() {
     </AnimatePresence>
   );
 }
+
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 // Page transitions
 const FadeInScale = ({ children }) => (
@@ -62,9 +71,13 @@ const FadeOnly = ({ children }) => (
 // ✅ Wrap `AnimatedRoutes` inside `App` and export it
 function App() {
   return (
+    <ThemeProvider theme={darkTheme}>  <CssBaseline />
+
     <Router>
       <AnimatedRoutes />
     </Router>
+
+    </ThemeProvider>
   );
 }
 
