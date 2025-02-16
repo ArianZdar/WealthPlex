@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { getPortfolioValue, addStockToWatchlist,removeStockFromWatchlist ,getUserWatchlist,getStocks,buyStock,sellStock,getProfitOnStock} from '../../assets/utils/userRequests'
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button } from "@mui/material";
+import { map } from 'framer-motion/client';
 
 
 function Portfolio() {
@@ -12,14 +13,10 @@ function Portfolio() {
   const [loading, setLoading] = useState(false); // Tracks loading state
   const [error, setError] = useState(null); // Tracks errors
   const [newStockSymbol, setNewStockSymbol] = useState(""); // User input for stock/ETF symbol
-
-
-  
-
-  // Function to handle adding a stock/ETF when user clicks "Add Stock"
   const [watchlist, setWatchlist] = useState([]);
   const [stocklist, setStocklist] = useState([]);
   const [profitlist, setProfit] = useState([]);
+  const [sellList, setSellList] = useState([]);
   
 
   
@@ -68,32 +65,39 @@ function Portfolio() {
   };
 
 
-  const handleGetWatchlist = async (e) => {
-    
+  const handleGetWatchlist = async () => {
     const username = localStorage.getItem("loggedInUsername");
-
+  
     try {
       const updatedWatchlist = await getUserWatchlist(username);
-      setWatchlist(updatedWatchlist); // Update watchlist with the new list
+      setWatchlist(updatedWatchlist); 
     } catch (error) {
-      setError("Failed to add stock to watchlist: " + error.message);
+      setError("Failed to fetch watchlist: " + error.message);
     }
-
+  
     try {
       const updatedPortfolio = await getStocks(username);
-      console.log(updatedPortfolio);
-      setStocklist(updatedPortfolio); // Update watchlist with the new list
+  
+
+      const updatedPortfolioWithProfit = await Promise.all(
+        updatedPortfolio.map(async (stock) => {
+          const profit = await getProfitOnStock(username, stock.symbol);
+          return { ...stock, profit };
+        })
+      );
+  
+      localStorage.setItem("stocks", JSON.stringify(updatedPortfolioWithProfit));
+      console.log(updatedPortfolioWithProfit);
+      setStocklist(updatedPortfolioWithProfit);
     } catch (error) {
-      setError("Failed to add stock to watchlist: " + error.message);
+      setError("Failed to fetch stocks: " + error.message);
     }
-
-
   };
 
   const handleSellQuantityChange = (index, value) => {
-    const updatedPortfolio = [...stocklist];
-    updatedPortfolio[index].quantity = value;
-    setStocklist(updatedPortfolio);
+    const updatedSellList = [...sellList];
+    updatedSellList[index] = value;
+    setSellList(updatedSellList);
   };
 
   const handleQuantityChange = (index, value) => {
@@ -110,29 +114,29 @@ function Portfolio() {
 
   const handleSellStock = async (symbol, quantity) => {
     const username = localStorage.getItem("loggedInUsername");
-    
+  
     try {
-      const profit = await sellStock(username,quantity,symbol);
-      const updatedPortfolio = await getStocks(username);
-      setStocklist(updatedPortfolio);
+      await sellStock(username, quantity, symbol); // Execute sell operation
+  
+      const updatedPortfolio = await getStocks(username); // Fetch updated portfolio
+  
+      // Ensure profit calculations are completed before updating state
+      const updatedPortfolioWithProfit = await Promise.all(
+        updatedPortfolio.map(async (stock) => {
+          const profit = await getProfitOnStock(username, stock.symbol);
+          return { ...stock, profit }; // Create a new object with the profit value
+        })
+      );
+  
+      setStocklist(updatedPortfolioWithProfit); // Update stocklist after profit is added
     } catch (error) {
-      setError("Failed to add stock to watchlist: " + error.message);
+      setError("Failed to sell stock: " + error.message);
     }
-
   };
 
-  const handleGetProfitForStock = async (symbol,index) => {
-    const username = localStorage.getItem("loggedInUsername");
-    
-    try {
-      const profit = await getProfitOnStock(username,symbol);
-      profitlist[index] = profit;
-      return profit;
-    } catch (error) {
-      setError("Failed to get openGainLoss: " + error.message);
-    }
 
-  };
+
+ 
 
   return (
     <div className="portfolio-container">
@@ -272,7 +276,7 @@ function Portfolio() {
                       </TableCell>
                       <TableCell align="right">{stock.price}</TableCell>
                       <TableCell align="right">{stock.amount}</TableCell>
-                      <TableCell align="right">{handleGetProfitForStock(stock.symbol, index)}</TableCell>
+                      <TableCell align="right">{stock.profit}</TableCell>
                       <TableCell align="right">
                         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
                           <TextField
@@ -288,7 +292,7 @@ function Portfolio() {
                             onChange={(e) => handleSellQuantityChange(index, e.target.value)}
                           />
                           <Button variant="outlined" color="success" onClick={() => {
-                            handleSellStock(stock.symbol, stock.amount);
+                            handleSellStock(stock.symbol, sellList[index]);
                             console.log("Buy button clicked");
                           }}>Sell</Button>
                         </Stack>

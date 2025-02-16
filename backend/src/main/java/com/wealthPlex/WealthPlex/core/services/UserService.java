@@ -224,7 +224,7 @@ public class UserService {
         }
         user.setProfit(user.getProfit() + profit);
         List<Stock> newStocks = new ArrayList<>(user.getStocks().stream().filter(userStock -> (!userStock.getSymbol().equals(symbol))).toList());
-        if (stock.getAmount()!= 0) {
+        if (stock.getAmount() != 0) {
             newStocks.add(stock);
         }
         user.setStocks(newStocks);

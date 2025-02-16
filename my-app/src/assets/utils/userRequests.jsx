@@ -161,7 +161,7 @@ async function getProfitOnStock(username,Symbol) {
 
         if (!response.ok) throw new Error("Failed to get profit on position");
 
-        const result = await response;
+        const result = await response.text()
         console.log("Get profit response:", result);
         return result;
     } catch (error) {
