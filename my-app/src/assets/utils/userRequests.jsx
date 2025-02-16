@@ -11,7 +11,7 @@ async function signup(username, password) {
         });
 
         if (!response.ok) throw new Error("Failed to signup");
-        await response;
+        return await response;
         
     } catch (error) {
         console.error("Signup Error:", error.message);
@@ -45,11 +45,10 @@ async function getPortfolioValue(username) {
         if (!response.ok) throw new Error("Failed to get protfolio value");
 
         const result = await response;
-        console.log("Login Response:", result);
+        console.log("Got profolio value :", result);
         return result;
     } catch (error) {
-        console.error("Login Error:", error.message);
-        throw error;
+        console.error("Fetch portfolio value error :", error.message);
     }
 
 }
@@ -63,11 +62,10 @@ async function addStockToWatchlist(username, symbol) {
         if (!response.ok) throw new Error("Failed to add stock to list");
 
         const result = await response.json();
-        console.log("Signup Response:", result);
+        console.log("Add to watchlist :", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("Error adding to watchlist:", error.message);
     }
 }
 
@@ -78,14 +76,13 @@ async function removeStockFromWatchlist(username, symbol) {
             method: "DELETE"
         });
 
-        if (!response.ok) throw new Error("Failed to add stock to list");
+        if (!response.ok) throw new Error("Failed to remove stock from watchlist");
 
         const result = await response.json();
-        console.log("Signup Response:", result);
+        console.log("Remove from watchlist response :", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("Error removing stock from watchlust:", error.message);
     }
 }
 
@@ -95,14 +92,13 @@ async function getUserWatchlist(username) {
             method: "GET"
         });
 
-        if (!response.ok) throw new Error("Failed to add stock to list");
+        if (!response.ok) throw new Error("Failed to get user watchlist");
 
         const result = await response.json();
-        console.log("Signup Response:", result);
+        console.log("User watchlist Response:", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("User watchlist Error:", error.message);
     }
 }
 
@@ -117,11 +113,10 @@ async function buyStock(username, amount, symbol, price) {
         if (!response.ok) throw new Error("Failed to buy stocks");
 
         const result = await response.json();
-        console.log("Signup Response:", result);
+        console.log("Buy stock response:", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("Buy stock Error:", error.message);
     }
 }
 
@@ -135,11 +130,10 @@ async function sellStock(username, amount, symbol) {
         if (!response.ok) throw new Error("Failed to sell stock ");
 
         const result = await response.json();
-        console.log("Signup Response:", result);
+        console.log("Sell stock Response:", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("Sell stock Error:", error.message);
     }
 }
 
@@ -149,14 +143,13 @@ async function getStocks(username) {
             method: "GET"
         });
 
-        if (!response.ok) throw new Error("Failed to add stock to list");
+        if (!response.ok) throw new Error("Failed get stocks");
 
         const result = await response.json();
-        console.log("Signup Response:", result);
+        console.log("Get stock Response:", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("Get stock Error:", error.message);
     }
 }
 
@@ -166,14 +159,13 @@ async function getProfitOnStock(username,Symbol) {
             method: "GET"
         });
 
-        if (!response.ok) throw new Error("Failed to add stock to list");
+        if (!response.ok) throw new Error("Failed to get profit on position");
 
         const result = await response;
-        console.log("Signup Response:", result);
+        console.log("Get profit response:", result);
         return result;
     } catch (error) {
-        console.error("Signup Error:", error.message);
-        throw error; // Rethrow error to handle it in UI
+        console.error("Get profit error:", error.message);
     }
 
 }
