@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { getPortfolioValue,setLongTermInvestor, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
 import { getStockRequests } from '../../assets/utils/stockInfoRequests';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography } from "@mui/material";
+import { Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { LineChart ,Gauge } from '@mui/x-charts/';
 import { p } from 'framer-motion/client';
 
 function Portfolio() {
@@ -22,6 +23,8 @@ function Portfolio() {
   const [userProfit, setUserProfit] = useState(0);
   const [openGainLoss, setOpenGainLoss] = useState(0);
   const [isLongTermInvestor, setIsLongTermInvestor] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [detailStock, setDetailStock] = useState([]);
 
   const handleAddStock = async (e) => {
     e.preventDefault();
@@ -37,6 +40,17 @@ function Portfolio() {
     } catch (error) {
       setError("Failed to add stock to watchlist: " + error.message);
     }
+  };
+
+
+  const handleClickOpen = (stock) => {
+    setDetailStock(stock);
+    console.log(stock);
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
   };
 
   const fetchProfit = async () => {
@@ -198,6 +212,72 @@ function Portfolio() {
   return (
     <div className="portfolio-container">
 
+
+<Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
+        <DialogTitle>{detailStock.symbol}</DialogTitle>
+        <DialogContent>
+          <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
+
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Typography variant="h5" gutterBottom fontWeight="bold">
+                WealthPlex rates this stock a
+              </Typography>
+              <Gauge width={80} height={80} value={9} valueMin={0} valueMax={10} />
+            </Stack>
+
+
+          <LineChart
+            xAxis={[
+              { 
+                data: ["Jan", "Feb", "Mar", "Apr", "May"], 
+                scaleType: "point"
+              }
+            ]}
+            series={[
+              { 
+                data: [400, 300, 500, 700, 600], 
+                color: "#1976d2", 
+                showMark: true, 
+                stackedArea: true 
+              }
+            ]}
+            width={600}
+            height={300}
+          />
+          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+          <Typography variant="h5" gutterBottom>Change (%)</Typography>
+          <Typography variant="h5" gutterBottom>{conditionallyFormatStringH5(detailStock.changePercent.toString())}</Typography>
+          <Typography variant="h5" gutterBottom>Volume</Typography>
+          <Typography variant="h5" gutterBottom>{detailStock.volume}</Typography>
+          </Stack>
+
+          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+          <Typography variant="h5" gutterBottom>Open price</Typography>
+          <Typography variant="h5" gutterBottom>{detailStock.openPrice}</Typography>
+          <Typography variant="h5" gutterBottom>Close price</Typography>
+          <Typography variant="h5" gutterBottom>{detailStock.closePrice}</Typography>
+          </Stack>
+
+
+
+          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+          <Typography variant="h5" gutterBottom>High price</Typography>
+          <Typography variant="h5" gutterBottom>{detailStock.highPrice}</Typography>
+          <Typography variant="h5" gutterBottom>Low price</Typography>
+          <Typography variant="h5" gutterBottom>{detailStock.lowPrice}</Typography>
+          </Stack>
+
+          <Typography variant="h5" gutterBottom>We thing this is worth a {9} because of : {detailStock.symbol}</Typography>
+          </Stack>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleClose} color="primary" variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} sx={{ flexGrow: 1 }}>
 
 
@@ -305,7 +385,7 @@ function Portfolio() {
                       watchlist.map((stock, index) => (
                         <TableRow key={stock.symbol} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                           <TableCell component="th" scope="row">
-                            {stock.symbol}
+                          <Button onClick={() => handleClickOpen(stock)}>{stock.symbol}</Button>
                           </TableCell>
                           <TableCell align="right">{conditionallyFormatStringBody2(stock.change.toString())}</TableCell>
                           <TableCell align="right">{conditionallyFormatStringBody2(stock.changePercent.toString())}</TableCell>
