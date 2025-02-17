@@ -223,13 +223,13 @@ function Portfolio() {
 <Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>{detailStock.symbol}</DialogTitle>
         <DialogContent>
-          <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
+          <Stack direction="column" alignItems="center" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
 
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Typography variant="h5" gutterBottom fontWeight="bold">
                 WealthPlex rates this stock a
               </Typography>
-              <Gauge width={80} height={80} value={detailStock.rating} valueMin={0} valueMax={10} />
+              <Gauge width={140} height={140} value={detailStock.rating} valueMin={0} valueMax={10} sx={{".MuiGauge-valueText": {fontSize: "24px",fontWeight: "bold",color: "#0d47a1"}}}/>
             </Stack>
 
 
