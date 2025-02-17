@@ -24,7 +24,7 @@ public class RankingController {
             String fullResponse = stockRatingService.getStockExplanation(stockSymbol, username);
             String extractedRating = stockRatingService.extractStockRating(fullResponse);
 
-            return ResponseEntity.ok("Stock Rating: " + extractedRating);
+            return ResponseEntity.ok(extractedRating);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Error fetching stock rating: " + e.getMessage());
         }

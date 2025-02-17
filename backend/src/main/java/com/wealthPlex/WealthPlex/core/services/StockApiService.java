@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class StockApiService {
 
-    String alphaVantageAPIkey = System.getenv("alphaVantageAPIkey");
+    String alphaVantageAPIkey = System.getenv("ALPHA_VANTAGE_API_KEY");
 
     public JSONObject getStockInformation(String symbol) {
 

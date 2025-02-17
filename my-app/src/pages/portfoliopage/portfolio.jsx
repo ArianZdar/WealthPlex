@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
 import { getPortfolioValue,setLongTermInvestor, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
-import { getStockRequests } from '../../assets/utils/stockInfoRequests';
+import { getStockRequests,getStockRating,getStockExplanation } from '../../assets/utils/stockInfoRequests';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { LineChart ,Gauge } from '@mui/x-charts/';
@@ -24,7 +24,7 @@ function Portfolio() {
   const [openGainLoss, setOpenGainLoss] = useState(0);
   const [isLongTermInvestor, setIsLongTermInvestor] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [detailStock, setDetailStock] = useState([]);
+  const [detailStock, setDetailStock] = useState({symbol: "",rating: 0,explanation:"", change: 0, changePercent: 0, currentPrice: 0, openPrice: 0, closePrice: 0, highPrice: 0, lowPrice: 0, volume: 0});
 
   const handleAddStock = async (e) => {
     e.preventDefault();
@@ -43,14 +43,21 @@ function Portfolio() {
   };
 
 
-  const handleClickOpen = (stock) => {
-    setDetailStock(stock);
+  const handleClickOpen = async (stock) => {;
     console.log(stock);
     setDialogOpen(true);
+    stock.rating = await getStockRating(stock.symbol);
+    stock.explanation = await getStockExplanation(stock.symbol);
+    console.log(stock);
+    setDetailStock(stock);
   };
 
   const handleClose = () => {
     setDialogOpen(false);
+    let detail = detailStock;
+    detail.rating = 0;
+    detail.explanation = "";
+    setDetailStock(detail);
   };
 
   const fetchProfit = async () => {
@@ -222,7 +229,7 @@ function Portfolio() {
               <Typography variant="h5" gutterBottom fontWeight="bold">
                 WealthPlex rates this stock a
               </Typography>
-              <Gauge width={80} height={80} value={9} valueMin={0} valueMax={10} />
+              <Gauge width={80} height={80} value={detailStock.rating} valueMin={0} valueMax={10} />
             </Stack>
 
 
@@ -267,7 +274,7 @@ function Portfolio() {
           <Typography variant="h5" gutterBottom>{detailStock.lowPrice}</Typography>
           </Stack>
 
-          <Typography variant="h5" gutterBottom>We thing this is worth a {9} because of : {detailStock.symbol}</Typography>
+          <Typography variant="h5" gutterBottom>Here's what we think : {detailStock.explanation}</Typography>
           </Stack>
         </DialogContent>
 
