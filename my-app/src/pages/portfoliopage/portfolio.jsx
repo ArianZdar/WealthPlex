@@ -12,7 +12,7 @@ function Portfolio() {
   const [stocks, setStocks] = useState([]); 
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null); 
-  const [newStockSymbol, setNewStockSymbol] = useState(""); l
+  const [newStockSymbol, setNewStockSymbol] = useState(""); 
   const [watchlist, setWatchlist] = useState([]); 
   const [stocklist, setStocklist] = useState([]); 
   const [profitlist, setProfit] = useState([]);
