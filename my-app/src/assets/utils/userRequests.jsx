@@ -86,6 +86,22 @@ async function addStockToWatchlist(username, symbol) {
     }
 }
 
+async function setLongTermInvestor(userId, isLongTermInvestor) {
+    try {
+        const response = await fetch(root + "/users/"+ userId + "/investmentType/"+isLongTermInvestor, {
+            method: "POST"
+        });
+
+        if (!response.ok) throw new Error("Failed to set investment type");
+
+        const result = await response.json();
+        console.log("Set investment type :", result);
+        return result;
+    } catch (error) {
+        console.error("Error setting investment type :", error.message);
+    }
+
+}
 
 async function removeStockFromWatchlist(username, symbol) {
     try {
@@ -178,7 +194,8 @@ async function getProfitOnStock(username,Symbol) {
 
         if (!response.ok) throw new Error("Failed to get profit on position");
 
-        const result = await response.text()
+        let result = await response.text()
+        result = parseFloat(result).toFixed(2);
         console.log("Get profit response:", result);
         return result;
     } catch (error) {
@@ -194,5 +211,5 @@ async function getProfitOnStock(username,Symbol) {
 
 
 
-export { signup, login ,getPortfolioValue,getUserProfit,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks,getProfitOnStock};
+export { signup, login ,getPortfolioValue,setLongTermInvestor,getUserProfit,addStockToWatchlist,removeStockFromWatchlist,getUserWatchlist,buyStock,sellStock,getStocks,getProfitOnStock};
 

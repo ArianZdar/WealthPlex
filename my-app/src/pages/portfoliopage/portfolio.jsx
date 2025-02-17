@@ -1,25 +1,27 @@
 import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
-import { getPortfolioValue, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
+import { getPortfolioValue,setLongTermInvestor, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
 import { getStockRequests } from '../../assets/utils/stockInfoRequests';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { AppBar, Toolbar, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup , Typography} from "@mui/material";
+import { Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography } from "@mui/material";
+import { p } from 'framer-motion/client';
 
 function Portfolio() {
   const navigate = useNavigate();
-  const [stocks, setStocks] = useState([]); // Holds stock & ETF data
-  const [loading, setLoading] = useState(false); // Tracks loading state
-  const [error, setError] = useState(null); // Tracks errors
-  const [newStockSymbol, setNewStockSymbol] = useState(""); // User input for stock/ETF symbol
-  const [watchlist, setWatchlist] = useState([]); // Initialize as empty array
-  const [stocklist, setStocklist] = useState([]); // Initialize as empty array
+  const [stocks, setStocks] = useState([]); 
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(null); 
+  const [newStockSymbol, setNewStockSymbol] = useState(""); l
+  const [watchlist, setWatchlist] = useState([]); 
+  const [stocklist, setStocklist] = useState([]); 
   const [profitlist, setProfit] = useState([]);
   const [sellList, setSellList] = useState([]);
   const [stockRecommendations, setStockRecommendations] = useState([]);
   const [portfolioValue, setPortfolioValue] = useState(0);
   const [userProfit, setUserProfit] = useState(0);
   const [openGainLoss, setOpenGainLoss] = useState(0);
+  const [isLongTermInvestor, setIsLongTermInvestor] = useState(false);
 
   const handleAddStock = async (e) => {
     e.preventDefault();
@@ -40,17 +42,24 @@ function Portfolio() {
   const fetchProfit = async () => {
     const username = localStorage.getItem("loggedInUsername");
     try {
-      const updatedProfit = await getUserProfit(username);
+      let updatedProfit = await getUserProfit(username);
+  
+      updatedProfit = Number(parseFloat(updatedProfit).toFixed(3)); 
+  
       setUserProfit(updatedProfit);
     } catch (error) {
       setError("Failed to get profit: " + error.message);
     }
-  }
+  };
 
   const fetchPortfolioValue = async () => {
     const username = localStorage.getItem("loggedInUsername");
     try {
-      const updatedPortfolioValue = await getPortfolioValue(username);
+      let updatedPortfolioValue = await getPortfolioValue(username);
+
+      updatedPortfolioValue = Number(parseFloat(updatedPortfolioValue).toFixed(3));
+
+
       setPortfolioValue(updatedPortfolioValue);
     } catch (error) {
       setError("Failed to get portfolio value: " + error.message);
@@ -65,6 +74,19 @@ function Portfolio() {
       setError("Failed to get stock recomendations: " + error.message);
     }
   };
+
+  const conditionallyFormatStringBody2 = (value) => (
+    <Typography variant="body2" sx={{ color: value.includes("-") ? "red" : "green" }}>
+      {value}
+    </Typography>
+  );
+
+
+  const conditionallyFormatStringH5 = (value) => (
+    <Typography variant="h5" sx={{ color: value.includes("-") ? "red" : "green" }}>
+      {value}
+    </Typography>
+  );
 
   const handleBuyStock = async (symbol, quantity, price) => {
     const username = localStorage.getItem("loggedInUsername");
@@ -95,7 +117,10 @@ function Portfolio() {
     await fetchPortfolioValue();
     await fetchProfit();
 
-    const openGainLoss = stocklist.reduce((acc, stock) => acc + parseFloat(stock.profit), 0);
+    let openGainLoss = stocklist.reduce((acc, stock) => acc + parseFloat(stock.profit), 0);
+
+    openGainLoss = Number(parseFloat(openGainLoss).toFixed(3));
+    await setLongTermInvestor(localStorage.getItem("loggedInUsername"), isLongTermInvestor);
     console.log(openGainLoss);
     setOpenGainLoss(openGainLoss);
 
@@ -135,6 +160,12 @@ function Portfolio() {
     setWatchlist(updatedWatchlist);
   };
 
+  const handleChangeIvestorType = (event) => {
+    setIsLongTermInvestor(event.target.checked);
+    console.log("Switch is now:", event.target.checked);
+
+  };
+
   const handlePriceChange = (index, value) => {
     const updatedWatchlist = [...watchlist];
     updatedWatchlist[index].price = value;
@@ -145,19 +176,20 @@ function Portfolio() {
     const username = localStorage.getItem("loggedInUsername");
 
     try {
-      await sellStock(username, quantity, symbol); // Execute sell operation
+      await sellStock(username, quantity, symbol); 
 
-      const updatedPortfolio = await getStocks(username); // Fetch updated portfolio
+      const updatedPortfolio = await getStocks(username); 
 
-      // Ensure profit calculations are completed before updating state
+
       const updatedPortfolioWithProfit = await Promise.all(
         updatedPortfolio.map(async (stock) => {
-          const profit = await getProfitOnStock(username, stock.symbol);
-          return { ...stock, profit }; // Create a new object with the profit value
+          let profit = await getProfitOnStock(username, stock.symbol);
+          profit = Number(parseFloat(profit).toFixed(3));
+          return { ...stock, profit }; 
         })
       );
 
-      setStocklist(updatedPortfolioWithProfit); // Update stocklist after profit is added
+      setStocklist(updatedPortfolioWithProfit); 
     } catch (error) {
       setError("Failed to sell stock: " + error.message);
     }
@@ -167,70 +199,79 @@ function Portfolio() {
     <div className="portfolio-container">
 
       <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} sx={{ flexGrow: 1 }}>
-      <Stack component = {Paper}direction="row" divider={<Divider orientation="horizontal" flexItem />} spacing={4} sx= {{
-        justifyContent: "center", 
-        alignItems:"center", 
-        position: "relative", 
-        width: "100v",
-        padding: 4,
-        height: "auto"}}> 
-                <Typography variant="h2" gutterBottom>Current stats</Typography>
-                <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
-                <Typography variant="h4" gutterBottom>Porfolio Value</Typography>
-                <Typography variant="h5" gutterBottom>{portfolioValue}</Typography>
-                </Stack>
-
-                <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
-                <Typography variant="h4" gutterBottom>Proift</Typography>
-                <Typography variant="h5" gutterBottom>{userProfit}</Typography>
-                </Stack>
 
 
-                <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
-                <Typography variant="h4" gutterBottom>Open/Gain Loss</Typography>
-                <Typography variant="h5" gutterBottom>{openGainLoss}</Typography>
-                </Stack>
+
+        <Stack component={Paper} direction="row" divider={<Divider orientation="horizontal" flexItem />} spacing={4} sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+          width: "100%",
+          padding: 4,
+          height: "auto"
+        }}>
 
 
-             
-              <div >
-                <form onChange={(event) => {
-                            setNewStockSymbol(event.target.value);
-                          }} onSubmit={handleAddStock}>
-                  <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={4} padding={2}>
-                    <ButtonGroup variant="contained" aria-label="Basic button group">
-                      <Button onClick={refresh}>Refresh</Button>
-                      <Button type="submit">Add Stock</Button>
-                    </ButtonGroup>
-                    <Autocomplete
-                      sx={{ minWidth: 300 }}
-                      disableClearable
-                      options={stockRecommendations || []}
-                      onInputChange={(event, newInputValue) => {
-                        setNewStockSymbol(newInputValue);
+          <FormControlLabel
+            control={<Switch checked={isLongTermInvestor} onChange={handleChangeIvestorType} />}
+            label={isLongTermInvestor ? "Is long term investor" : "Is short term investor"} />
+          <Typography variant="h2" gutterBottom>Current stats</Typography>
+          <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
+            <Typography variant="h4" gutterBottom>Porfolio Value</Typography>
+            <Typography variant="h5" gutterBottom>{portfolioValue}</Typography>
+          </Stack>
+
+          <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
+            <Typography variant="h4" gutterBottom>Profit</Typography>
+            <Typography variant="h5" gutterBottom>{conditionallyFormatStringH5(userProfit.toString())}</Typography>
+          </Stack>
+
+
+          <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
+            <Typography variant="h4" gutterBottom>Open/Gain Loss</Typography>
+            <Typography variant="h5" gutterBottom>{conditionallyFormatStringH5(openGainLoss.toString())}</Typography>
+          </Stack>
+
+
+
+          <div >
+            <form onChange={(event) => {
+              setNewStockSymbol(event.target.value);
+            }} onSubmit={handleAddStock}>
+              <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={4} padding={2}>
+                <ButtonGroup variant="contained" aria-label="Basic button group">
+                  <Button onClick={refresh}>Refresh</Button>
+                  <Button type="submit">Add Stock</Button>
+                </ButtonGroup>
+                <Autocomplete
+                  sx={{ minWidth: 300 }}
+                  disableClearable
+                  options={stockRecommendations || []}
+                  onInputChange={(event, newInputValue) => {
+                    setNewStockSymbol(newInputValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      onChange={(event) => {
+                        getStockRecomendations(event.target.value);
+                        setNewStockSymbol(event.target.value);
                       }}
-                      renderInput={(params) => (
-                        <TextField
-                          onChange={(event) => {
-                            getStockRecomendations(event.target.value);
-                            setNewStockSymbol(event.target.value);
-                          }}
-                          {...params}
-                          label="Enter Stock/ETF Symbol"
-                          slotProps={{
-                            input: {
-                              ...params.InputProps,
-                              type: 'search',
-                            },
-                          }}
-                        />
-                      )}
+                      {...params}
+                      label="Enter Stock/ETF Symbol"
+                      slotProps={{
+                        input: {
+                          ...params.InputProps,
+                          type: 'search',
+                        },
+                      }}
                     />
-                  </Stack>
-                </form>
-              </div>
+                  )}
+                />
+              </Stack>
+            </form>
+          </div>
 
-            </Stack>
+        </Stack>
 
         <div className="tables-container">
           <Box
@@ -240,18 +281,16 @@ function Portfolio() {
               justifyContent: "center",
               alignItems: "center",
               minHeight: "100vh",
-              width: "100vw",
               overflow: "hidden",
-              padding: 4,
               boxSizing: "border-box",
               flexGrow: 1,
             }}
           >
             <Stack direction="column" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
-              <TableContainer component={Paper}  sx={{ maxHeight: "60vh", overflowY: "auto" }}>
-                <Table sx={{ 
-                  minWidth: 900 
-                  }} aria-label="simple table">
+              <TableContainer component={Paper} sx={{ maxHeight: "50vh", overflowY: "auto" , width: "100%"}}>
+                <Table sx={{
+                 minWidth: "80%"
+                }} aria-label="simple table">
                   <TableHead>
                     <TableRow>
                       <TableCell>Stock Symbol</TableCell>
@@ -268,8 +307,8 @@ function Portfolio() {
                           <TableCell component="th" scope="row">
                             {stock.symbol}
                           </TableCell>
-                          <TableCell align="right">{stock.change}</TableCell>
-                          <TableCell align="right">{stock.changePercent}</TableCell>
+                          <TableCell align="right">{conditionallyFormatStringBody2(stock.change.toString())}</TableCell>
+                          <TableCell align="right">{conditionallyFormatStringBody2(stock.changePercent.toString())}</TableCell>
                           <TableCell align="right">{stock.currentPrice}</TableCell>
                           <TableCell align="right">
                             <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
@@ -320,7 +359,7 @@ function Portfolio() {
                 </Table>
               </TableContainer>
 
-              <TableContainer component={Paper}  sx={{ maxHeight: "60vh", overflowY: "auto" }}>
+              <TableContainer component={Paper} sx={{ maxHeight: "50vh", overflowY: "auto" ,width: "100%"}}>
                 <Table sx={{ minWidth: 900 }} aria-label="simple table">
                   <TableHead>
                     <TableRow>
@@ -340,7 +379,7 @@ function Portfolio() {
                           </TableCell>
                           <TableCell align="right">{stock.price}</TableCell>
                           <TableCell align="right">{stock.amount}</TableCell>
-                          <TableCell align="right">{stock.profit}</TableCell>
+                          <TableCell align="right">{conditionallyFormatStringBody2(stock.profit.toString())}</TableCell>
                           <TableCell align="right">
                             <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
                               <TextField
