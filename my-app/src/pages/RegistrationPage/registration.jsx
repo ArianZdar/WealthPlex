@@ -17,7 +17,8 @@ const Registration = () => {
             const response = await signup(username, password);
             if (response) {
                 console.log("Registration successful:", response);
-                navigate('/InvestmentType'); // Redirect to the investor page after successful registration
+                localStorage.setItem('loggedInUsername', username); 
+                navigate('/InvestmentType'); 
             } else {
                 console.error("Registration failed: Invalid data");
                 alert("Registration failed. Please try again.");
