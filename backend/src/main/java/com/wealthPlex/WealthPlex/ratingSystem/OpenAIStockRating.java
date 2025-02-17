@@ -58,38 +58,24 @@ public class OpenAIStockRating {
             new JSONObject().put("role", "system").put("content", 
                 "You are a financial analyst. Given the stock name and the type of investor you are advising for **in this case they are a"+
                 user.getInvestmentType()+
-                "***provide a **detailed** analysis in 1-2 paragraphs. You must also look on the internet for the company's financial"+
-                "performance, market trends, and growth prospects and conclude with a rating out of 10 on if this is good for the selected type of investor." +
+                "***provide a **detailed** analysis in 2 paragraphs. You must also look on the internet for the company's financial"+
+                "performance, market trends, upcoming earning dates with the market sentiment for these upcoming earnings and growth "+
+                "prospects and conclude with a statement on if this is a good investment for a "+
+                user.getInvestmentType()+
                 "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
                 "Mention recent news that may impact the stock price, whether positively or negatively. " +
                 "You Must give a rating out of 10 **in the format of X/10, and you must provide an in depth analysis"),
-            new JSONObject().put("role", "user").put("content",
-                "Stock: " + stockSymbol + ", Price: $" + price +
-                ", Volatility: " + volatility + ", User: " + username)
-        });
-
-        return sendOpenAIRequest(requestBody);
-    }
-    public String getStockRecommendation(String stockSymbol, String username) throws IOException {
-        BigDecimal price = getStockPrice(stockSymbol);
-        if (price == null) return "Error: Unable to fetch stock data.";
-    
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "gpt-3.5-turbo");
-        requestBody.put("messages", new Object[]{
-            new JSONObject().put("role", "system").put("content",
-                "You are an AI that provides stock recommendations based on market trends, investor type, and risk tolerance. " +
-                "Your goal is to suggest if this stock is a good investment for a **short-term or long-term investor**. " +
-                "Provide reasoning behind your recommendation based on price trends, volatility, and market sentiment."),
-            new JSONObject().put("role", "user").put("content",
+                new JSONObject().put("role", "user").put("content",
                 "Stock: " + stockSymbol + ", Price: $" + price + ", User: " + username +
-                ". Should a **short-term or long-term** investor consider this stock? Why?")
+                ". Should a "+
+                user.getInvestmentType()+
+                "consider this stock? Why?")
         });
-    
+
         return sendOpenAIRequest(requestBody);
     }
     
-
+    
     private BigDecimal getStockPrice(String stockSymbol) throws IOException {
         String url = ALPHA_VANTAGE_URL + stockSymbol + "&apikey=" + ALPHA_VANTAGE_API_KEY;
 
@@ -138,7 +124,7 @@ public class OpenAIStockRating {
     }
 
     public String extractStockRating(String aiResponse) {
-        // Regular expression to extract numbers followed by "/10"
+        //REGEX to extract numbers followed by "/10"
         Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?)/10");
         java.util.regex.Matcher matcher = pattern.matcher(aiResponse);
     

@@ -42,14 +42,5 @@ public class RankingController {
         }
     }
 
-    @GetMapping("/recommendation/{stockSymbol}")
-    public ResponseEntity<String> getStockRecommendation(
-        @PathVariable String stockSymbol, @RequestParam String username) {
-        try {
-            String recommendation = stockRatingService.getStockRecommendation(stockSymbol, username);
-            return ResponseEntity.ok(recommendation);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error fetching recommendation: " + e.getMessage());
-        }
-    }
+    
 }
