@@ -9,12 +9,12 @@ import { p } from 'framer-motion/client';
 
 function Portfolio() {
   const navigate = useNavigate();
-  const [stocks, setStocks] = useState([]); // Holds stock & ETF data
-  const [loading, setLoading] = useState(false); // Tracks loading state
-  const [error, setError] = useState(null); // Tracks errors
-  const [newStockSymbol, setNewStockSymbol] = useState(""); // User input for stock/ETF symbol
-  const [watchlist, setWatchlist] = useState([]); // Initialize as empty array
-  const [stocklist, setStocklist] = useState([]); // Initialize as empty array
+  const [stocks, setStocks] = useState([]); 
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(null); 
+  const [newStockSymbol, setNewStockSymbol] = useState(""); l
+  const [watchlist, setWatchlist] = useState([]); 
+  const [stocklist, setStocklist] = useState([]); 
   const [profitlist, setProfit] = useState([]);
   const [sellList, setSellList] = useState([]);
   const [stockRecommendations, setStockRecommendations] = useState([]);
@@ -176,20 +176,20 @@ function Portfolio() {
     const username = localStorage.getItem("loggedInUsername");
 
     try {
-      await sellStock(username, quantity, symbol); // Execute sell operation
+      await sellStock(username, quantity, symbol); 
 
-      const updatedPortfolio = await getStocks(username); // Fetch updated portfolio
+      const updatedPortfolio = await getStocks(username); 
 
 
       const updatedPortfolioWithProfit = await Promise.all(
         updatedPortfolio.map(async (stock) => {
           let profit = await getProfitOnStock(username, stock.symbol);
           profit = Number(parseFloat(profit).toFixed(3));
-          return { ...stock, profit }; // Create a new object with the profit value
+          return { ...stock, profit }; 
         })
       );
 
-      setStocklist(updatedPortfolioWithProfit); // Update stocklist after profit is added
+      setStocklist(updatedPortfolioWithProfit); 
     } catch (error) {
       setError("Failed to sell stock: " + error.message);
     }
