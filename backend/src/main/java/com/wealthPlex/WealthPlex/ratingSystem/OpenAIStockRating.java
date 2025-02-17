@@ -62,6 +62,25 @@ public class OpenAIStockRating {
 
         return sendOpenAIRequest(requestBody);
     }
+    public String getStockRecommendation(String stockSymbol, String username) throws IOException {
+        BigDecimal price = getStockPrice(stockSymbol);
+        if (price == null) return "Error: Unable to fetch stock data.";
+    
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("model", "gpt-3.5-turbo");
+        requestBody.put("messages", new Object[]{
+            new JSONObject().put("role", "system").put("content",
+                "You are an AI that provides stock recommendations based on market trends, investor type, and risk tolerance. " +
+                "Your goal is to suggest if this stock is a good investment for a **short-term or long-term investor**. " +
+                "Provide reasoning behind your recommendation based on price trends, volatility, and market sentiment."),
+            new JSONObject().put("role", "user").put("content",
+                "Stock: " + stockSymbol + ", Price: $" + price + ", User: " + username +
+                ". Should a **short-term or long-term** investor consider this stock? Why?")
+        });
+    
+        return sendOpenAIRequest(requestBody);
+    }
+    
 
     private BigDecimal getStockPrice(String stockSymbol) throws IOException {
         String url = ALPHA_VANTAGE_URL + stockSymbol + "&apikey=" + ALPHA_VANTAGE_API_KEY;

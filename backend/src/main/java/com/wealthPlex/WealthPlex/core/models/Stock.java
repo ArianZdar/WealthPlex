@@ -8,4 +8,6 @@ public class Stock {
     private String symbol;
     private double price;
     private int amount;
+    private double rating;
+    private String description;
 }
