@@ -4,6 +4,8 @@ import org.json.JSONObject;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
+import com.wealthPlex.WealthPlex.core.models.User;
+
 import ch.qos.logback.core.boolex.Matcher;
 
 import java.io.IOException;
@@ -15,6 +17,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 @Service
 public class OpenAIStockRating {
     private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
+
+    User user = new User();
 
     private static final Dotenv dotenv = Dotenv.configure()
         .directory(ENV_PATH)
@@ -45,13 +49,17 @@ public class OpenAIStockRating {
             return "Error: Unable to fetch stock data for " + stockSymbol;
         }
 
+
         BigDecimal volatility = getVolatility();
 
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", "gpt-3.5-turbo");
         requestBody.put("messages", new Object[]{
             new JSONObject().put("role", "system").put("content", 
-                "You are a financial analyst. Given the stock name and the type of investor you are advising for (short term or long term), provide a **detailed** analysis in 1-2 paragraphs. You must also look on the internet for the company's financial performance, market trends, and growth prospects and conclude with a rating out of 10 on if this is good for the selected type of investor." +
+                "You are a financial analyst. Given the stock name and the type of investor you are advising for **in this case they are a"+
+                user.getInvestmentType()+
+                "***provide a **detailed** analysis in 1-2 paragraphs. You must also look on the internet for the company's financial"+
+                "performance, market trends, and growth prospects and conclude with a rating out of 10 on if this is good for the selected type of investor." +
                 "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
                 "Mention recent news that may impact the stock price, whether positively or negatively. " +
                 "You Must give a rating out of 10 **in the format of X/10, and you must provide an in depth analysis"),

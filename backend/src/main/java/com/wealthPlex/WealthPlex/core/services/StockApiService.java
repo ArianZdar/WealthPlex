@@ -18,7 +18,6 @@ public class StockApiService {
 
     String alphaVantageAPIkey = System.getenv("alphaVantageAPIkey");
 
-
     public JSONObject getStockInformation(String symbol) {
 
         String url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey="+alphaVantageAPIkey;
