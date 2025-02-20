@@ -97,14 +97,14 @@ function Portfolio() {
   };
 
   const conditionallyFormatStringBody2 = (value) => (
-    <Typography variant="body2" sx={{ color: value.includes("-") ? "red" : "green" }}>
+    <Typography variant="body2" sx={{ color: (String(value)).includes("-") ? "red" : "green" }}>
       {value}
     </Typography>
   );
 
 
   const conditionallyFormatStringH5 = (value) => (
-    <Typography variant="h5" sx={{ color: value.includes("-") ? "red" : "green" }}>
+    <Typography variant="h5" sx={{ color: (String(value)).includes("-") ? "red" : "green" }}>
       {value}
     </Typography>
   );
@@ -253,7 +253,7 @@ function Portfolio() {
           />
           <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
           <Typography variant="h5" gutterBottom>Change (%)</Typography>
-          <Typography variant="h5" gutterBottom>{conditionallyFormatStringH5(detailStock.changePercent.toString())}</Typography>
+          <Typography variant="h5" gutterBottom>{conditionallyFormatStringH5(String(detailStock.changePercent))}</Typography>
           <Typography variant="h5" gutterBottom>Volume</Typography>
           <Typography variant="h5" gutterBottom>{detailStock.volume}</Typography>
           </Stack>
@@ -466,7 +466,7 @@ function Portfolio() {
                           </TableCell>
                           <TableCell align="right">{stock.price}</TableCell>
                           <TableCell align="right">{stock.amount}</TableCell>
-                          <TableCell align="right">{conditionallyFormatStringBody2(stock.profit.toString())}</TableCell>
+                          <TableCell align="right">{conditionallyFormatStringBody2(stock.profit)}</TableCell>
                           <TableCell align="right">
                             <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
                               <TextField
