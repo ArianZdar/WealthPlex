@@ -13,23 +13,15 @@ import java.net.UnknownHostException;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Autowired
-    HandlerInterceptor loggingInterceptor;
+    HandlerInterceptor loginInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        try {
-            String localIp = InetAddress.getLocalHost().getHostAddress();
-            String allowedOrigin = "http://" + localIp + ":3000";
-            System.out.println(allowedOrigin);
-
-            registry.addMapping("/**")
-                    .allowedOrigins(allowedOrigin, "http://localhost:3000")
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                    .allowCredentials(true);
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }}
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000", "http://192.168.*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true);
+        }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
