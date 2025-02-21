@@ -95,7 +95,7 @@ public class UserController {
     @GetMapping("/users/{userId}/watchlist")
     @ResponseStatus(HttpStatus.OK)
     public List<Map<String,Object>> getUserWatchlist(@PathVariable String userId) {
-        return userService.getUserWatchlist(userId);
+        return userService.refreshWatchlistValues(userId);
     }
 
     @GetMapping("/users/{userId}/watchlistR")

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { getPortfolioValue,setLongTermInvestor, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
 import { getStockRequests,getStockRating,getStockExplanation } from '../../assets/utils/stockInfoRequests';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Card, CardContent, Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { LineChart ,Gauge } from '@mui/x-charts/';
 import { p } from 'framer-motion/client';
 
@@ -223,16 +223,29 @@ function Portfolio() {
 <Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>{detailStock.symbol}</DialogTitle>
         <DialogContent>
-          <Stack direction="column" alignItems="center" divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
 
+          <Stack direction="column" alignItems="center" divider={<Divider orientation="horizontal" flexItem />} spacing={0.5}>
+          <Card variant="outlined" sx={{ width: "100%" }}>
+            <CardContent>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Typography variant="h5" gutterBottom fontWeight="bold">
                 WealthPlex rates this stock a
               </Typography>
               <Gauge width={140} height={140} value={detailStock.rating} valueMin={0} valueMax={10} sx={{".MuiGauge-valueText": {fontSize: "24px",fontWeight: "bold",color: "#0d47a1"}}}/>
             </Stack>
+          </CardContent>
+          </Card>
+          <Card variant="outlined" sx={{ width: "100%" }}>
+            <CardContent>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="column" spacing={1.5} alignItems="center" divider={<Divider orientation="horizontal" flexItem />}>
+          <Typography variant="h2" gutterBottom>{detailStock.currentPrice}</Typography>
+          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={1}>
+          <Typography variant="h5" gutterBottom>{detailStock.lowPrice}</Typography>
+          <Typography variant="h5" gutterBottom>{detailStock.highPrice}</Typography>
+          </Stack>
 
-
+          </Stack>
           <LineChart
             xAxis={[
               { 
@@ -251,7 +264,13 @@ function Portfolio() {
             width={600}
             height={300}
           />
-          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+          </Stack>
+            </CardContent>
+          </Card>
+          <Card variant="outlined" sx={{ width: "100%" }}>
+            <CardContent>
+            <Stack direction="column" spacing={1.5} alignItems="center" divider={<Divider orientation="horizontal" flexItem />}>
+            <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={1}>
           <Typography variant="h5" gutterBottom>Change (%)</Typography>
           <Typography variant="h5" gutterBottom>{conditionallyFormatStringH5(String(detailStock.changePercent))}</Typography>
           <Typography variant="h5" gutterBottom>Volume</Typography>
@@ -264,17 +283,18 @@ function Portfolio() {
           <Typography variant="h5" gutterBottom>Close price</Typography>
           <Typography variant="h5" gutterBottom>{detailStock.closePrice}</Typography>
           </Stack>
+            </Stack>
 
 
-
-          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
-          <Typography variant="h5" gutterBottom>High price</Typography>
-          <Typography variant="h5" gutterBottom>{detailStock.highPrice}</Typography>
-          <Typography variant="h5" gutterBottom>Low price</Typography>
-          <Typography variant="h5" gutterBottom>{detailStock.lowPrice}</Typography>
-          </Stack>
-
+            </CardContent>
+          </Card>
+        
+          <Card variant="outlined" sx={{ width: "100%" }}>
+          <CardContent>
           <Typography variant="h5" gutterBottom>Here's what we think : {detailStock.explanation}</Typography>
+            </CardContent>
+            </Card>
+          
           </Stack>
         </DialogContent>
 

@@ -114,6 +114,11 @@ public class UserRepository extends DocumentRepository {
         watchedStock.setCurrentPrice(Double.parseDouble(map.get("currentPrice").toString()));
         watchedStock.setChange(Double.parseDouble(map.get("change").toString()));
         watchedStock.setChangePercent(map.get("changePercent").toString());
+        watchedStock.setClosePrice(Double.parseDouble(map.get("closePrice").toString()));
+        watchedStock.setOpenPrice(Double.parseDouble(map.get("openPrice").toString()));
+        watchedStock.setVolume(Long.parseLong(map.get("volume").toString()));
+        watchedStock.setHighPrice(Double.parseDouble(map.get("highPrice").toString()));
+        watchedStock.setLowPrice(Double.parseDouble(map.get("lowPrice").toString()));
         return watchedStock;
     }
 }
