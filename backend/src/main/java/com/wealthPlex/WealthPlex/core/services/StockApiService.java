@@ -90,6 +90,9 @@ public class StockApiService {
     stockInfo.put("lowPrice", quoteMap.get("04. low"));
     stockInfo.put("volume", quoteMap.get("06. volume"));
     stockInfo.put("changePercent", quoteMap.get("10. change percent"));
+    stockInfo.put("change", quoteMap.get("09. change"));
+    stockInfo.put("currentPrice", quoteMap.get("05. price"));
+    stockInfo.put("symbol", quoteMap.get("01. symbol"));
 
     return stockInfo;
 }
