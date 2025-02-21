@@ -1,6 +1,5 @@
 package com.wealthPlex.WealthPlex.core.services;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +40,7 @@ public class StockApiService {
     }
 
 
-    public JSONObject getBestMatchSeeach(String keyword) {
+    public JSONObject getBestMatchSearch(String keyword) {
         String url = "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords="+keyword+"&apikey=" + alphaVantageAPIkey;
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -63,7 +62,7 @@ public class StockApiService {
     }
 
     public List<String> getMatches(String symbol) {
-        JSONObject data = getBestMatchSeeach(symbol);
+        JSONObject data = getBestMatchSearch(symbol);
         List<Object>  matches = data.getJSONArray("bestMatches").toList();
         if (matches.isEmpty()) return List.of();
         return matches.stream().map(match -> ((Map<String, Object>) match).get("1. symbol").toString()).toList();
@@ -72,18 +71,28 @@ public class StockApiService {
 
     public Map<String, Object> getStockInfo(String symbol) {
         JSONObject data = getStockInformation(symbol);
-        Map<String, Object> quoteMap = data.toMap();
-        quoteMap = (Map<String, Object>) quoteMap.get("Global Quote");
-        if (quoteMap.isEmpty()) return null;
-        double price = Double.parseDouble(quoteMap.get("05. price").toString());
-        String change = (quoteMap.get("09. change").toString());
-        String changePercent = (quoteMap.get("10. change percent").toString());
-        Map<String, Object> stockInfo = new HashMap<>();
-        stockInfo.put("price", price);
-        stockInfo.put("change", change);
-        stockInfo.put("changePercent", changePercent);
-        return stockInfo;
+
+        if (!data.has("Global Quote")) {
+        return Map.of("error", "Stock data not found for symbol: " + symbol);
     }
+
+    Map<String, Object> quoteMap = data.getJSONObject("Global Quote").toMap();
+
+    if (quoteMap.isEmpty()) {
+        return Map.of("error", "No stock data available.");
+    }
+
+
+    Map<String, Object> stockInfo = new HashMap<>();
+    stockInfo.put("openPrice", quoteMap.get("02. open"));
+    stockInfo.put("closePrice", quoteMap.get("08. previous close"));
+    stockInfo.put("highPrice", quoteMap.get("03. high"));
+    stockInfo.put("lowPrice", quoteMap.get("04. low"));
+    stockInfo.put("volume", quoteMap.get("06. volume"));
+    stockInfo.put("changePercent", quoteMap.get("10. change percent"));
+
+    return stockInfo;
+}
 
 
 
