@@ -1,18 +1,24 @@
 package com.wealthPlex.WealthPlex.core.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.wealthPlex.WealthPlex.ratingSystem.OpenAIStockRating;
-import org.springframework.http.ResponseEntity;
+import com.wealthPlex.WealthPlex.core.services.StockApiService;
+
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stocks")
 public class RankingController {  
 
     private final OpenAIStockRating stockRatingService;
+    private final StockApiService stockApiService;
 
-    public RankingController(OpenAIStockRating stockRatingService) {
+    public RankingController(OpenAIStockRating stockRatingService, StockApiService stockApiService) {
         this.stockRatingService = stockRatingService;
+        this.stockApiService = stockApiService;
     }
 
     @GetMapping("/rating/{stockSymbol}")
@@ -20,10 +26,8 @@ public class RankingController {
         @PathVariable String stockSymbol,
         @RequestParam String username) {
         try { 
-           
             String fullResponse = stockRatingService.getStockExplanation(stockSymbol, username);
             String extractedRating = stockRatingService.extractStockRating(fullResponse);
-
             return ResponseEntity.ok(extractedRating);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Error fetching stock rating: " + e.getMessage());
@@ -42,5 +46,14 @@ public class RankingController {
         }
     }
 
-    
+    @GetMapping("/info/{stockSymbol}")
+    public ResponseEntity<Map<String, Object>> getStockInfo(@PathVariable String stockSymbol) {
+        Map<String, Object> stockData = stockApiService.getStockInfo(stockSymbol);
+        
+        if (stockData.containsKey("error")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(stockData);
+        }
+
+        return ResponseEntity.ok(stockData);
+    }
 }
