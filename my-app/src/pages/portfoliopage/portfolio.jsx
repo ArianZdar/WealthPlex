@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
 import React, { useState } from 'react';
 import { getPortfolioValue,setLongTermInvestor, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
-import { getStockRequests,getStockRating,getStockExplanation } from '../../assets/utils/stockInfoRequests';
+import { getStockRequests,getStockRating,getStockExplanation ,getStockHistory} from '../../assets/utils/stockInfoRequests';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Card, CardContent, Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { LineChart ,Gauge } from '@mui/x-charts/';
@@ -18,6 +18,8 @@ function Portfolio() {
   const [stocklist, setStocklist] = useState([]); 
   const [profitlist, setProfit] = useState([]);
   const [sellList, setSellList] = useState([]);
+  const [priceHistory, setPriceHistory] = useState([]);
+  const [dateList, setDateList] = useState([]);
   const [stockRecommendations, setStockRecommendations] = useState([]);
   const [portfolioValue, setPortfolioValue] = useState(0);
   const [userProfit, setUserProfit] = useState(0);
@@ -39,6 +41,7 @@ function Portfolio() {
       setWatchlist(updatedWatchlist);
     } catch (error) {
       setError("Failed to add stock to watchlist: " + error.message);
+      alert("Failed to add stock to watchlist: " + error.message);
     }
   };
 
@@ -48,6 +51,14 @@ function Portfolio() {
     setDialogOpen(true);
     stock.rating = await getStockRating(stock.symbol);
     stock.explanation = await getStockExplanation(stock.symbol);
+
+    let history = await getStockHistory(stock.symbol);
+    setPriceHistory(history["price"]);
+    setDateList(history["date"]);
+
+
+    console.log("Stock history:", priceHistory);
+    console.log("Date list:", dateList);
     console.log(stock);
     setDetailStock(stock);
   };
@@ -249,13 +260,13 @@ function Portfolio() {
           <LineChart
             xAxis={[
               { 
-                data: ["Jan", "Feb", "Mar", "Apr", "May"], 
+                data: dateList, 
                 scaleType: "point"
               }
             ]}
             series={[
               { 
-                data: [400, 300, 500, 700, 600], 
+                data: priceHistory, 
                 color: "#1976d2", 
                 showMark: true, 
                 stackedArea: true 

@@ -79,7 +79,7 @@ public class UserController {
 
     @GetMapping("/users/{userId}/stocks/{stock}/profit")
     @ResponseStatus(HttpStatus.OK)
-    public double getStockProfit(@PathVariable String userId, @PathVariable String stock) {
+    public double getStockProfit(@PathVariable String userId, @PathVariable String stock) throws FileNotFoundException {
         return userService.getProfitOnStock(userId,stock);
     }
 
@@ -97,19 +97,19 @@ public class UserController {
 
     @GetMapping("/users/{userId}/watchlist")
     @ResponseStatus(HttpStatus.OK)
-    public List<Map<String,Object>> getUserWatchlist(@PathVariable String userId) {
+    public List<Map<String,Object>> getUserWatchlist(@PathVariable String userId) throws FileNotFoundException {
         return userService.refreshWatchlistValues(userId);
     }
 
     @GetMapping("/users/{userId}/watchlistR")
     @ResponseStatus(HttpStatus.OK)
-    public List<Map<String,Object>> refreshUserWatchlist(@PathVariable String userId) {
+    public List<Map<String,Object>> refreshUserWatchlist(@PathVariable String userId) throws FileNotFoundException {
         return userService.refreshWatchlistValues(userId);
     }
 
     @PostMapping("/users/{userId}/watchlist/{symbol}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Map<String,Object>> addStockToWatchlist(@PathVariable String userId, @PathVariable String symbol) {
+    public List<Map<String,Object>> addStockToWatchlist(@PathVariable String userId, @PathVariable String symbol) throws FileNotFoundException {
         return userService.addStockToWatchlist(userId,symbol);
     }
 
@@ -132,12 +132,12 @@ public class UserController {
     }
 
     @GetMapping("/stocks/history/{symbol}")
-    public ResponseEntity<JSONObject> getStockHistory(@PathVariable String symbol) {
-        //JSONObject stockHistory = stockApiService.queryStockHistory(symbol);
-//        if (stockHistory.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(stockHistory);
-//        }
-        return ResponseEntity.ok(new JSONObject());
+    public ResponseEntity<Map<String,Object>> getStockHistory(@PathVariable String symbol) throws FileNotFoundException {
+        Map<String,Object> stockHistory = stockApiService.getStockHistory(symbol);
+        if (stockHistory.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(stockHistory);
+        }
+        return ResponseEntity.ok(stockHistory);
     }
 
 

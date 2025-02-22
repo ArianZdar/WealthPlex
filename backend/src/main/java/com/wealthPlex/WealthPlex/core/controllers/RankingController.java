@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import com.wealthPlex.WealthPlex.ratingSystem.OpenAIStockRating;
 import com.wealthPlex.WealthPlex.core.services.StockApiService;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class RankingController {
     }
 
     @GetMapping("/info/{stockSymbol}")
-    public ResponseEntity<Map<String, Object>> getStockInfo(@PathVariable String stockSymbol) {
+    public ResponseEntity<Map<String, Object>> getStockInfo(@PathVariable String stockSymbol) throws FileNotFoundException {
         Map<String, Object> stockData = stockApiService.getStockInfo(stockSymbol);
         
         if (stockData.containsKey("error")) {

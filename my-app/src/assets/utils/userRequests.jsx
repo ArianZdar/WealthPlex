@@ -131,6 +131,7 @@ async function getUserWatchlist(username) {
         console.log("User watchlist Response:", result);
         return result;
     } catch (error) {
+        error.message = "Failed to get user watchlist";
         console.error("User watchlist Error:", error.message);
     }
 }
@@ -200,6 +201,7 @@ async function getProfitOnStock(username,Symbol) {
         return result;
     } catch (error) {
         console.error("Get profit error:", error.message);
+        error("Failed to get profit on position");
     }
 
 }

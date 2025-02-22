@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -81,7 +82,7 @@ public class UserService {
 
     }
 
-    public List<Map<String,Object>> addStockToWatchlist(String username, String symbol) {
+    public List<Map<String,Object>> addStockToWatchlist(String username, String symbol) throws FileNotFoundException {
         User user = (User) userRepository.getDocumentById(username);
         if (user.getWatchlist().stream().map(WatchedStock::getSymbol).toList().contains(symbol)) {
             return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
@@ -99,15 +100,21 @@ public class UserService {
         return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
     }
 
-    public List<Map<String,Object>> refreshWatchlistValues(String username) {
+    public List<Map<String,Object>> refreshWatchlistValues(String username) throws FileNotFoundException {
         User user = (User) userRepository.getDocumentById(username);
         List<WatchedStock> watchlist = user.getWatchlist().stream().map(stock -> {
                     String symbol = stock.getSymbol();
-                    Map<String, Object> info = stockApiService.getStockInfo(symbol);
+                    Map<String, Object> info = null;
+                    try {
+                        info = stockApiService.getStockInfo(symbol);
+                    } catch (FileNotFoundException e) {
+                        return null;
+                    }
                     WatchedStock watchedStock = userRepository.getWatchedStockFromMap(info);
                     return watchedStock;
                 })
                 .toList();
+        if (watchlist.stream().anyMatch(Objects::isNull)) throw new FileNotFoundException("Stock not found");
         user.setWatchlist(watchlist);
         userRepository.saveDocumentWithId(username,user);
         return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
@@ -196,7 +203,7 @@ public class UserService {
         return userRepository.getAsMap(user);
     }
 
-    public double getProfitOnStock(String username, String stockSymbol) {
+    public double getProfitOnStock(String username, String stockSymbol) throws FileNotFoundException {
         User user = (User) userRepository.getDocumentById(username);
         List<Stock> stocks = user.getStocks();
         Double stockPrice = Double.parseDouble(stockApiService.getStockInfo(stockSymbol).get("currentPrice").toString());
@@ -205,7 +212,7 @@ public class UserService {
 
     }
 
-    public double sellStock(String username, String symbol, int amount) throws IllegalArgumentException {
+    public double sellStock(String username, String symbol, int amount) throws IllegalArgumentException, FileNotFoundException {
         User user = (User) userRepository.getDocumentById(username);
         Stock stock = getStockFromUser(username, symbol);
         Double stockPrice = Double.parseDouble(stockApiService.getStockInfo(symbol).get("currentPrice").toString());

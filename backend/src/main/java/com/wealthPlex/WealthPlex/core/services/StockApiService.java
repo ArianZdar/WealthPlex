@@ -1,8 +1,10 @@
 package com.wealthPlex.WealthPlex.core.services;
 
+import com.google.api.gax.rpc.NotFoundException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -45,7 +47,7 @@ public class StockApiService {
     }
 
 
-    public JSONObject getBestMatchSearch(String keyword) {
+    public Map<String,Object> getBestMatchSearch(String keyword) {
         String url = "https://finnhub.io/api/v1/search?q="+keyword+"&exchange=US&token=" + finnhubAPIKey;
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -63,30 +65,20 @@ public class StockApiService {
             throw new RuntimeException(e);
         }
         JSONObject data = new JSONObject(body);
-        return data;
+        Map<String, Object> resultMap = data.toMap();
+        return resultMap;
     }
 
     public List<String> getMatches(String symbol) {
-        JSONObject data = getBestMatchSearch(symbol);
+        Map<String, Object> data = getBestMatchSearch(symbol);
     
         System.out.println("API Response: " + data.toString());
-    
-        if (!data.has("bestMatches")) {
-            System.err.println("Error: 'bestMatches' not found in API response.");
-            return List.of();
-        }
-    
-        List<Object> matches = data.getJSONArray("result").toList();
-    
-        if (matches.isEmpty()) {
-            return List.of();
-        }
-    
-        return matches.stream()
-                      .map(match -> ((Map<String, Object>) match).get("symbol").toString())
-                      .toList();
+        if (data.get("count").toString().equals("0")) return List.of();
+
+        List<Map<String, Object>> results= (List<Map<String, Object>>) data.get("result");
+        return results.stream().map(item -> item.get("symbol").toString()).toList();
     }
-    public Map<String, Object> queryStockHistory(String symbol) {
+    public Map<String, Object> queryStockHistory(String symbol) throws FileNotFoundException {
         String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol + "?interval=1d&range=30d";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -107,17 +99,21 @@ public class StockApiService {
         Map<String, Object> dataMap = data.toMap();
         dataMap = (Map<String, Object>) dataMap.get("chart");
         List<Object> results = (List<Object>) dataMap.get("result");
+        if (results == null) {
+            throw new FileNotFoundException("No results found for symbol: " + symbol);
+        }
         Map<String,Object> info = (Map<String, Object>) results.get(0);
         return info;
     }
 
-    public List<Map<String, Object>> getStockHistory(String symbol) {
+    public Map<String, Object> getStockHistory(String symbol) throws FileNotFoundException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         Map<String, Object> query = queryStockHistory(symbol);
         List<Integer> timeStamps = (List<Integer>) query.get("timestamp");
         HashMap<String, Object> indicators = (HashMap<String, Object>) query.get("indicators");
         List<HashMap<String, List<Object>>> quotes = (List<HashMap<String, List<Object>>>) indicators.get("quote");
-        return IntStream.range(0,timeStamps.size()).mapToObj((num -> {
+
+        List<Map<String, Object>> historyList = IntStream.range(0,timeStamps.size()).mapToObj((num -> {
             Map<String, Object> stockHistory = new HashMap<>();
             stockHistory.put("price", Float.parseFloat(quotes.get(0).get("close").get(num).toString()));
             long timeStamp = Long.parseLong(timeStamps.get(num).toString());
@@ -127,13 +123,22 @@ public class StockApiService {
             return stockHistory;
         })).toList();
 
+        List<Float> priceList = historyList.stream().map(map -> Float.parseFloat(map.get("price").toString())).toList();
+        List<String> dateList = historyList.stream().map(map -> (map.get("date").toString())).toList();
+
+        Map<String, Object> stockHistory = new HashMap<>();
+        stockHistory.put("price", priceList);
+        stockHistory.put("date", dateList);
+
+        return stockHistory;
+
     }
 
     
     
 
 
-    public Map<String, Object> getStockInfo(String symbol) {
+    public Map<String, Object> getStockInfo(String symbol) throws FileNotFoundException {
 
     JSONObject data = getStockInformation(symbol);
     Map<String, Object> quoteMap = data.toMap();

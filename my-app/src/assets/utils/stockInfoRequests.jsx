@@ -38,6 +38,22 @@ async function getStockRequests(symbol) {
         }
     }
 
+    async function getStockHistory(symbol) {
+        try {
+            const username = localStorage.getItem("loggedInUsername");
+            const response = await fetch(`${root}/stocks/history/${symbol}`, {
+                method: "GET"
+            });
+    
+            if (!response.ok) throw new Error("Failed to get stock history");
+            const result = await response.json();
+            console.log(result);
+            return (result);
+        } catch (error) {
+            console.error("stock history error:", error.message);
+        }
+    }
+
     async function getStockExplanation(symbol) {
         try {
             const username = localStorage.getItem("loggedInUsername");
@@ -56,4 +72,4 @@ async function getStockRequests(symbol) {
 
 
 
-export {getStockRequests, getStockRating, getStockExplanation};
+export {getStockRequests, getStockRating, getStockExplanation,getStockHistory};

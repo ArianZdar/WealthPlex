@@ -23,8 +23,6 @@ class manualTests {
 	void manualTests()  {
 
         StockApiService service =  new StockApiService();
-        List<Map<String, Object>> prices = service.getStockHistory("AAPL");
-        System.out.println(prices);
 
     }
 
