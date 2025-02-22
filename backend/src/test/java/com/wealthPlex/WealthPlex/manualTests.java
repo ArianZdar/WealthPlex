@@ -1,62 +1,77 @@
-/*package com.wealthPlex.WealthPlex;
+package com.wealthPlex.WealthPlex;
 
-import com.wealthPlex.WealthPlex.core.models.Stock;
-import com.wealthPlex.WealthPlex.core.models.User;
-import com.wealthPlex.WealthPlex.core.models.WatchedStock;
-import com.wealthPlex.WealthPlex.core.repositories.UserRepository;
-import com.wealthPlex.WealthPlex.core.services.StockPriceService;
-import com.wealthPlex.WealthPlex.core.services.UserService;
+
+import com.wealthPlex.WealthPlex.core.services.StockApiService;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class manualTests {
 
-	@Autowired
-	UserService userService;
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	StockPriceService stockPriceService;
+
 
 	@Test
-	void manualTests() {
-		Stock newStock = new Stock();
-		newStock.setPrice(20.0D);
-		newStock.setSymbol("NVDA");
-		newStock.setAmount(2000);
-		WatchedStock watchedStock = new WatchedStock();
-		watchedStock.setSymbol("NVDA");
-		List<WatchedStock> watchlist = List.of(watchedStock);
-		User user = new User();
-		user.setUsername("admin");
-		user.setPassword("admin");
-		user.setId("admin");
-		user.setStocks(List.of(newStock));
-		user.setProfit(0.0D);
-		user.setWatchlist(watchlist);
-		userRepository.saveDocumentWithId(user.getId(),user);
-		Stock newStock2 = new Stock();
-		newStock2.setPrice(25.0D);
-		newStock.setSymbol("NVDA");
-		newStock.setAmount(2000);
+	void manualTests()  {
 
-		try {
-			userService.buyStock("admin","NVDA",25.0D,2000);
-			userService.sellStock("admin","NVDA",25.0D,2000);
-		} catch (FileNotFoundException f) {
-			System.out.println(f.getMessage());
-		}
+        StockApiService service =  new StockApiService();
+        List<Map<String, Object>> prices = service.getStockHistory("AAPL");
+        System.out.println(prices);
 
-		User FetchedUser = (User) userRepository.getDocumentById("admin");
-		System.out.println(userRepository.getAsMap(FetchedUser));
-		//stockPriceService.getStockPrice("NVDA");
+    }
 
-	}
+    @Test
+    void manualTests2()  {
+
+
+        String url = "https://finnhub.io/api/v1/quote/?symbol=NVDA&token=cuqn8o9r01qsd02fanbgcuqn8o9r01qsd02fanc0";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)")
+                .GET()
+                .build();
+
+        String body = "";
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            body = response.body();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error fetching stock history: " + e.getMessage());
+        }
+
+        JSONObject data = new JSONObject(body);
+        System.out.println("API Response: " + data.toString());
+
+    }
+
+    @Test
+    void manualTests3()  {
+        String url = "https://query2.finance.yahoo.com/v1/test/getcrumb";
+        String headers = "";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+
+        String body = "";
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            body = response.body();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error fetching stock history: " + e.getMessage());
+        }
+
+
+    }
 
 }
-*/

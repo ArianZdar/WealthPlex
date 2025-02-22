@@ -133,11 +133,11 @@ public class UserController {
 
     @GetMapping("/stocks/history/{symbol}")
     public ResponseEntity<JSONObject> getStockHistory(@PathVariable String symbol) {
-        JSONObject stockHistory = stockApiService.getStockHistory(symbol);
-        if (stockHistory.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(stockHistory);
-        }
-        return ResponseEntity.ok(stockHistory);
+        //JSONObject stockHistory = stockApiService.queryStockHistory(symbol);
+//        if (stockHistory.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(stockHistory);
+//        }
+        return ResponseEntity.ok(new JSONObject());
     }
 
 
