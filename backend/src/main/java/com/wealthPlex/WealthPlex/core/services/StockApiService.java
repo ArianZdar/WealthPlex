@@ -63,10 +63,25 @@ public class StockApiService {
 
     public List<String> getMatches(String symbol) {
         JSONObject data = getBestMatchSearch(symbol);
-        List<Object>  matches = data.getJSONArray("bestMatches").toList();
-        if (matches.isEmpty()) return List.of();
-        return matches.stream().map(match -> ((Map<String, Object>) match).get("1. symbol").toString()).toList();
+    
+        System.out.println("API Response: " + data.toString());
+    
+        if (!data.has("bestMatches")) {
+            System.err.println("Error: 'bestMatches' not found in API response.");
+            return List.of();
         }
+    
+        List<Object> matches = data.getJSONArray("bestMatches").toList();
+    
+        if (matches.isEmpty()) {
+            return List.of();
+        }
+    
+        return matches.stream()
+                      .map(match -> ((Map<String, Object>) match).get("1. symbol").toString())
+                      .toList();
+    }
+    
 
 
     public Map<String, Object> getStockInfo(String symbol) {

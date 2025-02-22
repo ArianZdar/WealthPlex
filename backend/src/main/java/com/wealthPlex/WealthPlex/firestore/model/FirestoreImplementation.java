@@ -6,8 +6,10 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,24 +20,40 @@ import java.util.concurrent.ExecutionException;
 @Configuration
 public class FirestoreImplementation {
 
-    private final String serviceAcccountPath = System.getenv("WEALTHPLEX_APPLICATION_CREDENTIALS");
-    private final String projectId = System.getenv("WEALTHPLEX_PROJECTID");
+    private final Dotenv dotenv = Dotenv.load();
+    private final String serviceAccountPath = dotenv.get("WEALTHPLEX_APPLICATION_CREDENTIALS");
+    private final String projectId = dotenv.get("WEALTHPLEX_PROJECTID");
     private Firestore firestore = null;
 
     private void init() {
         try {
-            FileInputStream serviceAccount = new FileInputStream(serviceAcccountPath);
+            if (serviceAccountPath == null || serviceAccountPath.isEmpty()) {
+                throw new RuntimeException("Error: WEALTHPLEX_APPLICATION_CREDENTIALS is not set or is empty.");
+            }
+
+            File serviceFile = new File(serviceAccountPath);
+            if (!serviceFile.exists()) {
+                throw new RuntimeException("Error: Firestore service account file not found at: " + serviceAccountPath);
+            }
+
+            FileInputStream serviceAccount = new FileInputStream(serviceFile);
+
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .setProjectId(projectId)
                     .build();
-            FirebaseApp.initializeApp(options);
-            this.firestore = FirestoreClient.getFirestore();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
+
+            this.firestore = FirestoreClient.getFirestore();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read Firestore credentials", e);
+        }
     }
+
     public void setFirestore(Firestore firestore) {
         this.firestore = firestore;
     }
@@ -57,7 +75,7 @@ public class FirestoreImplementation {
 
     public DocumentSnapshot getDocument(String collectionName, String documentId) {
         DocumentReference documentReference = getCollectionReference(collectionName).document(documentId);
-        return  getDocumentFromReference(documentReference);
+        return getDocumentFromReference(documentReference);
     }
 
     public DocumentSnapshot getDocumentFromReference(DocumentReference reference) {
@@ -93,13 +111,12 @@ public class FirestoreImplementation {
 
     public DocumentReference addDocumentToCollectionWithId(String collectionName, Map<String, Object> data, String id) {
         ApiFuture<WriteResult> writeResult = getFirestore().collection(collectionName).document(id).set(data);
-        WriteResult result = null;
         try {
-            result = writeResult.get();
+            writeResult.get();
+            return getFirestore().collection(collectionName).document(id);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-        return getFirestore().collection(collectionName).document(id);
     }
 
     public WriteResult updateDocument(String collectionName, String documentId, Map<String, Object> data) {
@@ -127,6 +144,5 @@ public class FirestoreImplementation {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
