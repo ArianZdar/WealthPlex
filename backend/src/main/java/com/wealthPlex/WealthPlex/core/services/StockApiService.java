@@ -81,6 +81,34 @@ public class StockApiService {
                       .map(match -> ((Map<String, Object>) match).get("1. symbol").toString())
                       .toList();
     }
+    public JSONObject getStockHistory(String symbol) {
+        String url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&apikey=" + alphaVantageAPIkey;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+    
+        String body = "";
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            body = response.body();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error fetching stock history: " + e.getMessage());
+        }
+    
+        System.out.println("API Response: " + body);
+    
+        JSONObject data = new JSONObject(body);
+    
+        if (data.has("Information")) {
+            System.err.println("⚠️ API Rate Limit Exceeded: " + data.getString("Information"));
+            return new JSONObject();
+        }
+    
+        return data;
+    }
+    
     
 
 

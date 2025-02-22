@@ -4,8 +4,11 @@ import com.wealthPlex.WealthPlex.core.DTOs.SignupRequest;
 import com.wealthPlex.WealthPlex.core.DTOs.StockBuyRequest;
 import com.wealthPlex.WealthPlex.core.services.StockApiService;
 import com.wealthPlex.WealthPlex.core.services.UserService;
+
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
@@ -128,6 +131,14 @@ public class UserController {
         return stockApiService.getMatches(symbol);
     }
 
+    @GetMapping("/stocks/history/{symbol}")
+    public ResponseEntity<JSONObject> getStockHistory(@PathVariable String symbol) {
+        JSONObject stockHistory = stockApiService.getStockHistory(symbol);
+        if (stockHistory.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(stockHistory);
+        }
+        return ResponseEntity.ok(stockHistory);
+    }
 
 
 
