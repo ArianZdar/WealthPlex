@@ -2,6 +2,7 @@ package com.wealthPlex.WealthPlex.core.services;
 
 import com.google.api.gax.rpc.NotFoundException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,11 +135,6 @@ public class StockApiService {
         return stockHistory;
 
     }
-
-    
-    
-
-
     public Map<String, Object> getStockInfo(String symbol) throws FileNotFoundException {
 
     JSONObject data = getStockInformation(symbol);
@@ -161,8 +158,50 @@ public class StockApiService {
     return stockInfo;
 }
 
+public String getNextEarningsDate(String symbol) {
+    String url = "https://finnhub.io/api/v1/stock/earnings?symbol=" + symbol + "&token=" + finnhubAPIKey;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .build();
 
-
-
-
+    try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        String responseBody = response.body();
+        
+        System.out.println("Finnhub earnings response: " + responseBody); // Debug log
+        
+        if (responseBody != null && !responseBody.isEmpty()) {
+            JSONArray earnings = new JSONArray(responseBody);
+            if (earnings.length() > 0) {
+                // Sort through the earnings dates to find the next upcoming one
+                LocalDate today = LocalDate.now();
+                LocalDate nextEarnings = null;
+                
+                for (int i = 0; i < earnings.length(); i++) {
+                    JSONObject earning = earnings.getJSONObject(i);
+                    if (earning.has("date")) {  // Check if 'date' field exists
+                        String date = earning.getString("date");
+                        LocalDate earningDate = LocalDate.parse(date);
+                        
+                        if (earningDate.isAfter(today)) {
+                            if (nextEarnings == null || earningDate.isBefore(nextEarnings)) {
+                                nextEarnings = earningDate;
+                            }
+                        }
+                    }
+                }
+                if (nextEarnings != null) {
+                    return nextEarnings.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"));
+                }
+            }
+        }
+        return "Expected in the next quarter";
+    } catch (Exception e) {
+        System.out.println("Error fetching earnings date: " + e.getMessage());
+        e.printStackTrace();
+        return "Expected in the next quarter";
+    }
+}
 }

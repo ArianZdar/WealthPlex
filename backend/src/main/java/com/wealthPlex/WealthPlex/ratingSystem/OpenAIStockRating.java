@@ -3,9 +3,11 @@ package com.wealthPlex.WealthPlex.ratingSystem;
 import org.json.JSONObject;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.wealthPlex.WealthPlex.core.models.User;
-
+import com.wealthPlex.WealthPlex.core.services.StockApiService;
+import com.wealthPlex.WealthPlex.core.services.UserService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -15,6 +17,12 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
 public class OpenAIStockRating {
+    @Autowired
+    private StockApiService stockApiService;
+
+    @Autowired
+    private UserService userService;
+
     private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
 
     User user = new User();
@@ -26,14 +34,11 @@ public class OpenAIStockRating {
         .load();
 
     private static final String OPENAI_API_KEY = dotenv.get("OPENAI_API_KEY");
-    private static final String ALPHA_VANTAGE_API_KEY = dotenv.get("ALPHA_VANTAGE_API_KEY");
-
+    private static final String FINNHUB_API_KEY = "cuv94chr01qpi6ru2aggcuv94chr01qpi6ru2ah0";
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
 
     static {
-        System.out.println("✅ OpenAI API Key: " + OPENAI_API_KEY);
-        System.out.println("✅ Alpha Vantage API Key: " + ALPHA_VANTAGE_API_KEY);
+        System.out.println("OpenAI API Key: " + OPENAI_API_KEY);
     }
 
     
@@ -42,41 +47,82 @@ public class OpenAIStockRating {
         return extractStockRating(fullResponse);  
     }
 
-    public String getStockExplanation(String stockSymbol, String username) throws IOException {
-        BigDecimal price = getStockPrice(stockSymbol);
-        if (price == null) {
-            return "Error: Unable to fetch stock data for " + stockSymbol;
-        }
+    public String getStockExplanation(String stockSymbol, String investmentType) throws IOException {
+        try {
+            String earningsDate;
+            try {
+                earningsDate = stockApiService.getNextEarningsDate(stockSymbol);
+                if (earningsDate == null) {
+                    earningsDate = "Expected in the next quarter";
+                }
+            } catch (Exception e) {
+                System.out.println("Error getting earnings date: " + e.getMessage());
+                earningsDate = "Expected in the next quarter";
+            }
 
+            // Create investment-type specific guidance
+            String investmentGuidance = investmentType.equalsIgnoreCase("long-term") ?
+                "Focus on fundamental strength, long-term growth potential, competitive advantages, and sustainable business models. "
+                + "Consider factors like market leadership, R&D investments, industry trends, and long-term market opportunities. "
+                + "Pay special attention to the company's financial health, debt levels, and cash flow sustainability."
+                :
+                "Focus on technical indicators, momentum signals, short-term catalysts, and market sentiment. "
+                + "Consider factors like trading volume, price action, upcoming events, and short-term market trends. "
+                + "Pay special attention to volatility patterns and near-term price movements.";
 
-        BigDecimal volatility = getVolatility();
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("model", "gpt-3.5-turbo");
+            requestBody.put("messages", new Object[]{
+                new JSONObject().put("role", "system").put("content",
+                    "You are a financial analyst providing personalized stock analysis for a " + investmentType + " investor. "
+                    + "Your response must start with a numerical rating in the exact format:\n"
+                    + "RATING: X/10\n\n"
+                    + "where X is a number between 0 and 10 based on the stock's potential for " + investmentType + " investment.\n\n"
+                    + "After the rating, provide a well-organized analysis with these sections:\n\n"
+                    + "Market Sentiment:\n"
+                    + "• Current market position\n"
+                    + "• Recent price trends\n"
+                    + "• Market sentiment indicators\n\n"
+                    + "Technical Analysis:\n"
+                    + "• Key price levels\n"
+                    + "• Trading patterns\n"
+                    + "• Volume analysis\n\n"
+                    + "Fundamental Factors:\n"
+                    + "• Financial metrics\n"
+                    + "• Company developments\n"
+                    + "• Industry position\n\n"
+                    + "Earnings Outlook:\n"
+                    + "• Next earnings date\n"
+                    + "• Recent performance\n"
+                    + "• Analyst expectations\n\n"
+                    + "Risk Assessment:\n"
+                    + "• Key risks\n"
+                    + "• Market challenges\n"
+                    + "• Potential headwinds\n\n"
+                    + investmentGuidance),
 
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "gpt-3.5-turbo");
-        requestBody.put("messages", new Object[]{
-            new JSONObject().put("role", "system").put("content", 
-                "You are a financial analyst. Given the stock name and the type of investor you are advising for **in this case they are a"+
-                user.getInvestmentType()+
-                "***provide a **detailed** analysis in 2 paragraphs. You must also look on the internet for the company's financial"+
-                "performance, market trends, upcoming earning dates with the market sentiment for these upcoming earnings and growth "+
-                "prospects and conclude with a statement on if this is a good investment for a "+
-                user.getInvestmentType()+
-                "Discuss the stock's volatility, upcoming earnings reports, and market sentiment. " +
-                "Mention recent news that may impact the stock price, whether positively or negatively. " +
-                "You Must give a rating out of 10 **in the format of X/10, and you must provide an in depth analysis"),
                 new JSONObject().put("role", "user").put("content",
-                "Stock: " + stockSymbol + ", Price: $" + price + ", User: " + username +
-                ". Should a "+
-                user.getInvestmentType()+
-                "consider this stock? Why?")
-        });
+                    "Analyze " + stockSymbol + " stock specifically for a " + investmentType + " investor and provide a rating out of 10. "
+                    + "The next earnings report is on " + earningsDate + ". "
+                    + (investmentType.equalsIgnoreCase("long-term") ?
+                        "Consider long-term growth potential, competitive advantages, and fundamental strength in your analysis."
+                        :
+                        "Consider short-term catalysts, technical indicators, and immediate market opportunities in your analysis.")
+                )
+            });
 
-        return sendOpenAIRequest(requestBody);
+            String response = sendOpenAIRequest(requestBody);
+            System.out.println("OpenAI Response: " + response);
+            return response;
+        } catch (Exception e) {
+            System.out.println("Error in getStockExplanation: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
-    
     private BigDecimal getStockPrice(String stockSymbol) throws IOException {
-        String url = ALPHA_VANTAGE_URL + stockSymbol + "&apikey=" + ALPHA_VANTAGE_API_KEY;
+        String url = "https://finnhub.io/api/v1/quote?symbol=" + stockSymbol + "&token=" + FINNHUB_API_KEY;
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -90,14 +136,12 @@ public class OpenAIStockRating {
         }
 
         JSONObject json = new JSONObject(response.body().string());
-        if (!json.has("Global Quote")) {
+        if (!json.has("c")) {
             return null;
         }
 
-        JSONObject quote = json.getJSONObject("Global Quote");
-        return new BigDecimal(quote.optString("05. price", "0"));
+        return new BigDecimal(json.optString("c", "0"));
     }
-
     private String sendOpenAIRequest(JSONObject requestBody) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -110,8 +154,8 @@ public class OpenAIStockRating {
         Response response = client.newCall(request).execute();
 
         if (!response.isSuccessful()) {
-            System.out.println("❌ OpenAI API Error: " + response.code() + " - " + response.message());
-            System.out.println("🔍 Response Body: " + (response.body() != null ? response.body().string() : "null"));
+            System.out.println(" OpenAI API Error: " + response.code() + " - " + response.message());
+            System.out.println(" Response Body: " + (response.body() != null ? response.body().string() : "null"));
             return "Error: Failed to get response from AI.";
         }
 
@@ -123,12 +167,12 @@ public class OpenAIStockRating {
     }
 
     public String extractStockRating(String aiResponse) {
-        //REGEX to extract numbers followed by "/10"
+        //REGEX
         Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?)/10");
         java.util.regex.Matcher matcher = pattern.matcher(aiResponse);
     
         if (matcher.find()) {
-            return matcher.group(1) + "/10";  // Extracted rating
+            return matcher.group(1) + "/10";  // extract rating
         }
     
         // If no rating found, return a default message
