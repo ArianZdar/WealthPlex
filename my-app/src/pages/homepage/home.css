@@ -11,6 +11,7 @@ body {
     height: 100vh;
 }
 
+/* Features Section */
 .features-container {
     display: flex;
     justify-content: space-between; /* Even spacing between columns */
@@ -18,30 +19,26 @@ body {
     padding: 20px 0;
     border-top: 1px solid #ccc; /* Top border for the section */
     border-bottom: 1px solid #ccc; /* Bottom border for the section */
-  }
+}
 
-  .feature {
+.feature {
     flex: 1; /* Equal width for all columns */
     text-align: center; /* Center-align text */
     padding: 0 10px; /* Add some padding inside columns */
-  }
+}
 
-  .feature h3 {
+.feature h3 {
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 10px;
     line-height: 1.4;
-    transition: background-color 0.4s ease-in-out, transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out; 
+    color: black; /* Text is now black */
+    transition: transform 0.4s ease-in-out; 
+}
 
-  }
-  .feature h3:hover {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    line-height: 1.4;
+.feature h3:hover {
     transform: scale(1.2);
-  }
-
+}
 
 /* Container - Centered layout */
 .container {
@@ -63,19 +60,24 @@ body {
 h1 {
     font-size: 2.5rem;
     font-weight: 600;
-    color: #2A2A2A; /* Wealthsimple-like dark gray */
+    color: black; /* Changed from dark gray to black */
     margin-bottom: 1rem;
 }
 
 /* Subtitle / Description */
 p {
     font-size: 1.1rem;
-    color: #555; /* Lighter gray for contrast */
+    color: black; /* Changed from lighter gray to black */
     line-height: 1.6;
     max-width: 600px;
     margin: 0 auto;
 }
-
+.market-trend-title{
+    color: black;
+}
+.date-display{
+    color: black;
+}
 /* Wealthsimple-Inspired Button */
 .button {
     margin-top: 1vw;
@@ -83,25 +85,23 @@ p {
     padding: 12px 24px;
     font-size: 1rem;
     font-weight: bold;
-    color: #ffffff;
-    background: #5D8736; /* Wealthsimple Blue */
+    color: white;
+    background: black; /* Changed to black */
     border: none;
     border-radius: 30px;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 87, 255, 0.2); /* Soft button shadow */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Adjusted to match the black theme */
 }
 
 .button:hover {
-    background: #007a4c; /* Darker blue on hover */
+    background: #333; /* Dark gray for hover effect */
     transform: translateY(-3px); /* Lift effect */
 }
 
 .button:active {
     transform: translateY(1px); /* Press effect */
 }
-
-
 
 /* Responsive Design */
 @media (max-width: 768px) {

@@ -227,6 +227,36 @@ function Portfolio() {
     }
   };
 
+  const handleApiError = (error) => {
+    console.error('API Error:', error);
+    if (error.message?.includes('429')) {
+        setError('API rate limit reached. Please try again in a minute.');
+    } else {
+        setError('An error occurred while fetching data. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  const fetchStockData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+        const response = await fetch('/api/stocks/whatever');
+        if (!response.ok) {
+            if (response.status === 429) {
+                throw new Error('429: Rate limit exceeded');
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setStocks(data || []); // Ensure we always set an array
+    } catch (error) {
+        handleApiError(error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
   return (
     <div className="portfolio-container">
 

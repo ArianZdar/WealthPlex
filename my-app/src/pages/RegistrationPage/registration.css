@@ -148,18 +148,22 @@
     font-size: 20px;
   }
   
-  .registration-wrapper .login-link {
-    font-size: 14.5px;
-    text-align: center;
-    margin: 20px 0 15px;
-  }
   
-  .login-link p a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  
-  .login-link p a:hover {
-    text-decoration: underline;
-  }
+/* Styling for the login-link */
+.registration-wrapper .login-link {
+  font-size: 14.5px;
+  text-align: center;
+  margin: 20px 0 15px;
+  color: white; /* Ensure text is white */
+}
+
+/* Styling for the login-link anchor tag */
+.login-link p a {
+  color: white; /* Ensure link is also white */
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link p a:hover {
+  text-decoration: underline;
+}
