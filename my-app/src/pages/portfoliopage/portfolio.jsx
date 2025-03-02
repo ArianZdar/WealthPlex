@@ -1,12 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import './portfolio.css';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { getPortfolioValue,setLongTermInvestor, addStockToWatchlist, removeStockFromWatchlist, getUserWatchlist, getStocks, buyStock, sellStock, getProfitOnStock, getUserProfit } from '../../assets/utils/userRequests';
 import { getStockRequests,getStockRating,getStockExplanation ,getStockHistory} from '../../assets/utils/stockInfoRequests';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Card, CardContent, Switch,FormControlLabel, Box, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Divider, TextField, Button, Autocomplete, ButtonGroup, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { LineChart ,Gauge } from '@mui/x-charts/';
-import { p } from 'framer-motion/client';
 
 function Portfolio() {
   const navigate = useNavigate();
@@ -28,6 +27,10 @@ function Portfolio() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [detailStock, setDetailStock] = useState({symbol: "",rating: 0,explanation:"", change: 0, changePercent: 0, currentPrice: 0, openPrice: 0, closePrice: 0, highPrice: 0, lowPrice: 0, volume: 0});
 
+  useEffect(() => {
+    refresh();
+  },[]);
+  
   const handleAddStock = async (e) => {
     e.preventDefault();
     if (!newStockSymbol.trim()) {
@@ -90,8 +93,6 @@ function Portfolio() {
       let updatedPortfolioValue = await getPortfolioValue(username);
 
       updatedPortfolioValue = Number(parseFloat(updatedPortfolioValue).toFixed(3));
-
-
       setPortfolioValue(updatedPortfolioValue);
     } catch (error) {
       setError("Failed to get portfolio value: " + error.message);
@@ -148,13 +149,7 @@ function Portfolio() {
     const username = localStorage.getItem("loggedInUsername");
     await fetchPortfolioValue();
     await fetchProfit();
-
-    let openGainLoss = stocklist.reduce((acc, stock) => acc + parseFloat(stock.profit), 0);
-
-    openGainLoss = Number(parseFloat(openGainLoss).toFixed(3));
     await setLongTermInvestor(localStorage.getItem("loggedInUsername"), isLongTermInvestor);
-    console.log(openGainLoss);
-    setOpenGainLoss(openGainLoss);
 
     try {
       const updatedWatchlist = await getUserWatchlist(username);
@@ -171,13 +166,22 @@ function Portfolio() {
           return { ...stock, profit };
         })
       );
+      
+      let openGainLoss = updatedPortfolioWithProfit.reduce((acc, stock) => acc + parseFloat(stock.profit), 0);
+      openGainLoss = Number(parseFloat(openGainLoss).toFixed(3));
+      setOpenGainLoss(openGainLoss);
+      
 
       localStorage.setItem("stocks", JSON.stringify(updatedPortfolioWithProfit));
       console.log(updatedPortfolioWithProfit);
       setStocklist(updatedPortfolioWithProfit);
+
     } catch (error) {
       setError("Failed to fetch stocks: " + error.message);
     }
+     
+    
+   
   };
 
   const handleSellQuantityChange = (index, value) => {

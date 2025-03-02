@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -68,7 +65,19 @@ public class UserService {
 
         return user.getStocks().stream().
                 mapToDouble(stock -> {
-                    double stockPrice = user.getWatchlist().stream().filter(watchedStock -> watchedStock.getSymbol().equals(stock.getSymbol())).findFirst().get().getCurrentPrice();
+                    double stockPrice;
+                    Optional<WatchedStock> optWatchedStock = user.getWatchlist().stream().filter(watchedStock -> watchedStock.getSymbol().equals(stock.getSymbol())).findFirst();
+                    if (optWatchedStock.isPresent())
+                    {
+                        stockPrice =optWatchedStock.get().getCurrentPrice();
+                    } else {
+                        try {
+                            stockPrice = Double.parseDouble(stockApiService.getStockInfo(stock.getSymbol()).get("currentPrice").toString());
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
                     return stockPrice*stock.getAmount();
                 }).
                 sum();
@@ -89,8 +98,12 @@ public class UserService {
         }
         WatchedStock watchedStock =  new WatchedStock();
         watchedStock.setSymbol(symbol);
-        Map<String,Object> info = stockApiService.getStockInfo(symbol);
-        if (info == null) return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
+        Map<String,Object> info;
+        try {
+            info = stockApiService.getStockInfo(symbol);
+        } catch (FileNotFoundException e) {
+            return user.getWatchlist().stream().map( stock -> userRepository.getWatchedStockAsMap(stock)).toList();
+        }
         watchedStock = userRepository.getWatchedStockFromMap(info);
         List<WatchedStock> watchedStocks = new ArrayList<>();
         user.getWatchlist().stream().forEach(watchedStocks::add);
@@ -139,7 +152,7 @@ public class UserService {
         User user = (User) userRepository.getDocumentById(username);
         WatchedStock stockToRemove =  user.getWatchlist().stream().filter(stock -> stock.getSymbol().equals(stockSymbol)).findFirst().orElse(null);
         List<WatchedStock> watchedStocks = new ArrayList<>();
-        user.getWatchlist().stream().forEach(watchedStocks::add);
+        user.getWatchlist().forEach(watchedStocks::add);
         watchedStocks.remove(stockToRemove);
         user.setWatchlist(watchedStocks);
         userRepository.saveDocumentWithId(username,user);
