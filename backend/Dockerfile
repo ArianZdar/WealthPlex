@@ -1,6 +1,6 @@
 
 #Rebuild our backend :D
-FROM gradle:latest AS BUILD
+FROM gradle:latest AS buildstage
 WORKDIR /walthplexbackend
 COPY . .
 RUN gradle build
@@ -11,7 +11,7 @@ WORKDIR /walthplexbackend
 # Remember to have environment variables setup, as well as service account (temp)
 
 #copy the newly built jar :D
-COPY --from=BUILD /walthplexbackend/build/libs/WealthPlex-0.0.1-SNAPSHOT.jar WealthPlex.jar
+COPY --from=buildstage /walthplexbackend/build/libs/WealthPlex-0.0.1-SNAPSHOT.jar WealthPlex.jar
 COPY service-account.json service-account.json
 EXPOSE 8080
 
