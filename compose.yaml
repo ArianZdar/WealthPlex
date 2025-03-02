@@ -4,14 +4,33 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./backend
+    networks:
+      static_network:
+        ipv4_address: 192.168.100.10
     ports:
-      - "8080:8080"
+      - "0.0.0.0:8080:8080"
     env_file:
       - .env
+    environment:
+      - LOCAL_IP=X.X.X.X
 
   frontend:
     build:
       context: ./my-app
       dockerfile : Dockerfile
+    networks:
+      static_network:
+        ipv4_address: 192.168.100.11
     ports:
       - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://X.X.X.X:8080
+      - HOST=0.0.0.0
+    command : npm run start_container
+
+networks:
+  static_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "192.168.100.0/24"

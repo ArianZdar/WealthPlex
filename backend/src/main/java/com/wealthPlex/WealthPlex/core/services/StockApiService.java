@@ -26,11 +26,7 @@ import java.util.stream.IntStream;
 @Service
 public class StockApiService {
 
-    private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
-
-
     private static final Dotenv dotenv = Dotenv.configure()
-            .directory(ENV_PATH)
             .ignoreIfMalformed()
             .ignoreIfMissing()
             .load();

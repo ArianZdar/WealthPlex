@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Wealthplex",
+  "name": "Wealthplex : AI porfolio analyser",
   "icons": [
     {
       "src": "favicon.ico",

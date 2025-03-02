@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const root = "http://localhost:8080";
+const root = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080';
+
 
 async function signup(username, password) {
     try {
@@ -21,6 +22,7 @@ async function signup(username, password) {
 
 async function login(username, password) {
     try {
+        console.log(process.env.REACT_APP_BACKEND_URL);
         const response = await fetch(root + `/users/login`, { // Assuming login endpoint
             method: "POST", // Change GET to POST for authentication
             headers: { "Content-Type": "application/json" },

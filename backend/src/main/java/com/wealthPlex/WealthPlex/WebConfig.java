@@ -17,14 +17,46 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+
+        String localIp = System.getenv("LOCAL_IP");
+        if (localIp != null) {
+            System.out.println("Running in docker container, local ip is : " + localIp);
+        } else {
+            System.out.println("Not running in container, may run into issues");
+            localIp = "127.0.0.1";
+        }
+
+
+        if (!localIp.matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+            throw new IllegalArgumentException("Invalid IP address format");
+        }
+        String[] parts = localIp.split("\\.");
+        String localOrigins = parts[0] + "." + parts[1] + "." + parts[2] + ".*";
+        localOrigins = "http://" + localIp + ":3000";
+        System.out.println("allowing origin : "+localOrigins);
+
+        System.out.println("---------------------------------Frontend will be deployed on : http://"+localIp+":3000 ---------------------------------");
+
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "http://192.168.*")
+                .allowedOrigins(localOrigins)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(true);
+                .allowCredentials(false)
+                .allowedHeaders("*");
         }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor);
     }
+
+    public String getLocalIp() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return "localhost";
+        }
+    }
+
+
 }
