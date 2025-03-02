@@ -1,6 +1,8 @@
 package com.wealthPlex.WealthPlex.core.services;
 
 import com.google.api.gax.rpc.NotFoundException;
+import com.wealthPlex.WealthPlex.core.models.User;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,16 @@ import java.util.stream.IntStream;
 @Service
 public class StockApiService {
 
-    String finnhubAPIKey = System.getenv("FINNHUB_API_KEY");
+    private static final String ENV_PATH = "/Users/hamzadaqa/Desktop/WealthPlex/WealthPlex/backend";
+
+
+    private static final Dotenv dotenv = Dotenv.configure()
+            .directory(ENV_PATH)
+            .ignoreIfMalformed()
+            .ignoreIfMissing()
+            .load();
+
+    private static final String finnhubAPIKey = dotenv.get("FINNHUB_API_KEY");
 
     public JSONObject getStockInformation(String symbol) {
 
